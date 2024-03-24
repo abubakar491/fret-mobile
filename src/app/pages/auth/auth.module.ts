@@ -7,13 +7,14 @@ import { IonicModule } from '@ionic/angular';
 // import { IonIntlTelInputModule } from 'ion-intl-tel-v2';
 import { SharedModule } from '../../shared/shared.module';
 import { LoginPage } from './login/login.page';
-import { OrderScannerComponent } from './../../components/order-scanner/order-scanner.component';
+import { BarcodeScannerComponent } from 'app/components/barcode-scanner/barcode-scanner.component';
+
 // import { IonicSelectableModule } from 'ionic-selectable';
 
 const routes: Routes = [
   {
     path: 'login',
-    component: OrderScannerComponent,
+    component: BarcodeScannerComponent,
   },
 ];
 

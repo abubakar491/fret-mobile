@@ -1,4 +1,3 @@
-
 import {
   AfterViewInit,
   Component,
@@ -11,7 +10,9 @@ import {
 } from '@angular/core';
 import {
   Barcode,
+  BarcodeFormat,
   BarcodeScanner,
+  LensFacing,
 } from '@capacitor-mlkit/barcode-scanning';
 import { ModalController, ToastController } from '@ionic/angular';
 
@@ -26,9 +27,9 @@ interface OrderList {
   templateUrl: './order-scanner.component.html',
   styleUrls: ['./order-scanner.component.scss'],
 })
-
-export class OrderScannerComponent
-  implements OnInit, AfterViewInit, OnDestroy {
+export class OrderScannerComponent implements OnInit, AfterViewInit, OnDestroy {
+  @Input() formats: BarcodeFormat[] = [];
+  @Input() lensFacing: LensFacing = LensFacing.Back;
   @ViewChild('square') squareElement!: ElementRef<HTMLDivElement>;
 
   public isTorchAvailable = false;
@@ -53,14 +54,14 @@ export class OrderScannerComponent
     item12: { expectedQuantity: 5, scannedQuantity: 0 },
     item13: { expectedQuantity: 5, scannedQuantity: 0 },
     item14: { expectedQuantity: 5, scannedQuantity: 0 },
-    item15: { expectedQuantity: 5, scannedQuantity: 0 }
+    item15: { expectedQuantity: 5, scannedQuantity: 0 },
   };
 
   constructor(
     private readonly ngZone: NgZone,
     private toastController: ToastController,
     private modalController: ModalController
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.barcodeArr = [];
@@ -204,14 +205,14 @@ export class OrderScannerComponent
     const scaledRect = this.getScaledRectangle();
     const detectionCornerPoints = scaledRect
       ? [
-        [scaledRect.left, scaledRect.top],
-        [scaledRect.left + scaledRect.width, scaledRect.top],
-        [
-          scaledRect.left + scaledRect.width,
-          scaledRect.top + scaledRect.height,
-        ],
-        [scaledRect.left, scaledRect.top + scaledRect.height],
-      ]
+          [scaledRect.left, scaledRect.top],
+          [scaledRect.left + scaledRect.width, scaledRect.top],
+          [
+            scaledRect.left + scaledRect.width,
+            scaledRect.top + scaledRect.height,
+          ],
+          [scaledRect.left, scaledRect.top + scaledRect.height],
+        ]
       : undefined;
 
     const cornerPoints = barcode.cornerPoints;
@@ -249,17 +250,5 @@ export class OrderScannerComponent
   private stopScan(): void {
     document.querySelector('body')?.classList.remove('barcode-scanning-active');
     BarcodeScanner.stopScan();
-  }
-
-  public async openSettings(): Promise<void> {
-    await BarcodeScanner.openSettings();
-  }
-
-  public async installGoogleBarcodeScannerModule(): Promise<void> {
-    await BarcodeScanner.installGoogleBarcodeScannerModule();
-  }
-
-  public async requestPermissions(): Promise<void> {
-    await BarcodeScanner.requestPermissions();
   }
 }

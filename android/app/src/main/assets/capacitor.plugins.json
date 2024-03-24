@@ -1,11 +1,11 @@
 [
 	{
-		"pkg": "@capacitor-community/fcm",
-		"classpath": "com.getcapacitor.community.fcm.FCMPlugin"
-	},
-	{
 		"pkg": "@capacitor-mlkit/barcode-scanning",
 		"classpath": "io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.BarcodeScannerPlugin"
+	},
+	{
+		"pkg": "@capacitor-community/fcm",
+		"classpath": "com.getcapacitor.community.fcm.FCMPlugin"
 	},
 	{
 		"pkg": "@capacitor/action-sheet",

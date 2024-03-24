@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="closeModal()">
+      <ion-button>
         <ion-icon name="chevron-back"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -12,7 +12,7 @@
 <ion-content>
   <div #square class="square">
     <div class="square_without_borders">
-      <img *ngIf="!throttling" src="assets/images/barcode-scanner-icon.png" style="max-width: 75%;"/>
+      <img *ngIf="!throttling" src="assets/images/barcode-scanner-icon.png" style="max-width: 75%;" />
     </div>
   </div>
   <div class="list_div">
@@ -45,15 +45,13 @@
     </div>
 
     <div class="button-container">
-      <span *ngIf="barcodeArr.length === 0" (click)="closeModal()" class="close-button">
+      <span *ngIf="barcodeArr.length === 0" class="close-button">
         close
       </span>
       <span *ngIf="barcodeArr.length > 0" (click)="completeOrder()" class="complete-button">
         Complete
       </span>
-      <span class="close-button" (click)="openSettings()">Open Settings</span>
-      <span class="close-button" (click)="installGoogleBarcodeScannerModule()">Install Google Barcode Scanner Module</span>
-      <span class="close-button" (click)="requestPermissions()">Request Permissions</span>
+
     </div>
   </div>
 </ion-content>
