@@ -1,0 +1,262 @@
+.discussion-detail {
+  height: 100%;
+
+  &-back-btn {
+    position: absolute;
+    z-index: 9999;
+  }
+
+  &-content {
+    --padding-bottom: 120px;
+
+    .list {
+      position: relative;
+      width: 100%;
+    }
+  }
+}
+
+.order-ref {
+  padding: 5px;
+  text-align: center;
+}
+
+$userBackgroundColor: #4b7198;
+$toUserBackgroundColor: #01acac;
+$lightColor: #0da3e0;
+
+ion-content .scroll-content {
+  background-color: #fff;
+}
+
+ion-footer {
+  background-color: #fff;
+  height: 255px;
+  left: 0;
+  bottom: 0;
+  position: absolute;
+  z-index: 10;
+  display: block;
+  width: 100%;
+}
+
+.line-breaker {
+  white-space: normal;
+}
+
+.input-wrap {
+  padding: 5px;
+  display: flex;
+  textarea {
+    flex: 1;
+    height: auto;
+    padding-top: 11px;
+    resize: none;
+    font-size: 14px;
+    overflow: auto;
+  }
+}
+
+.message-wrap {
+  padding: 0 10px;
+  // margin-bottom: 100px;
+
+  .message {
+    position: relative;
+    padding: 7px 0;
+    text-align: left;
+
+    .user-img {
+      position: absolute;
+      border-radius: 45px;
+      width: 45px;
+      height: 45px;
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.36);
+      line-height: 43px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .msg-detail {
+      width: 100%;
+      display: inline-block;
+      p {
+        margin: 0;
+      }
+      .msg-info {
+        width: 100%;
+        clear: both;
+        p {
+          font-size: 0.8em;
+          color: #888;
+        }
+      }
+
+      .msg-content {
+        position: relative;
+        margin-top: 5px;
+        border-radius: 5px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        color: #fff;
+        width: auto;
+        max-width: 80%;
+        span.triangle {
+          background-color: $toUserBackgroundColor;
+          border-radius: 2px;
+          height: 8px;
+          width: 8px;
+          top: 3px;
+          display: block;
+          border-style: solid;
+          border-color: $toUserBackgroundColor;
+          border-width: 1px;
+          -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+          position: absolute;
+        }
+        .msg-time {
+          position: absolute;
+          left: -32px;
+          font-size: 11px;
+          color: #8b8b8b;
+          top: 11px;
+        }
+        .message-content-audio {
+          width: 150px;
+          display: block;
+          svg {
+            float: right;
+            border-radius: 50%;
+          }
+          .audio-control {
+            position: relative;
+            top: 7px;
+            float: left;
+          }
+          .active-audio-past-time {
+            position: absolute;
+            height: 2px;
+            width: 100px;
+            background-color: #01acac;
+            top: 22px;
+            left: 22px;
+
+            .current-past-time {
+              background-color: #fff;
+              height: 2px;
+              position: absolute;
+            }
+          }
+
+          .current-time {
+            font-size: 10px;
+            position: absolute;
+            bottom: 1px;
+            left: 22px;
+          }
+          .current-audio-file-duration {
+            font-size: 10px;
+            position: absolute;
+            bottom: 1px;
+            right: 35px;
+          }
+        }
+      }
+    }
+  }
+
+  .message.left {
+    .msg-content {
+      background-color: $toUserBackgroundColor;
+      float: left;
+    }
+
+    .user-img {
+      left: 0;
+    }
+    .msg-content {
+      color: #fff;
+      span.triangle {
+        border-top-width: 0;
+        border-right-width: 0;
+        left: -3px;
+      }
+      .msg-time {
+        right: -32px;
+        left: auto;
+      }
+    }
+  }
+
+  .message.right {
+    .msg-detail {
+      .msg-info {
+        text-align: right;
+      }
+    }
+    .user-img {
+      right: 0;
+    }
+    ion-spinner {
+      position: absolute;
+      right: 10px;
+      top: 50px;
+    }
+    .msg-content {
+      background-color: $userBackgroundColor;
+      float: right;
+      span.triangle {
+        background-color: $userBackgroundColor !important;
+        border-color: $userBackgroundColor !important;
+        border-bottom-width: 0;
+        border-left-width: 0;
+        right: -3px;
+      }
+      .msg-time {
+        left: -32px;
+        right: auto;
+      }
+    }
+  }
+
+  .message.left .msg-content,
+  .message.right .msg-content {
+    &.issue-message {
+      background-color: #ff5b57;
+      .triangle {
+        background-color: #ff5b57 !important;
+        border-color: #ff5b57 !important;
+      }
+    }
+  }
+}
+
+.footer-btn {
+  background-color: transparent;
+  width: 40px;
+  color: #00acad;
+}
+
+#chat-options {
+  .action {
+    text-align: center;
+    border: 1px solid #eee;
+    padding: 10px;
+
+    .option-icon {
+      font-size: 35px;
+      color: #011d68;
+    }
+
+    &.action-send-problem {
+      color: #fff;
+      background-color: var(--freterium-color-red-500);
+
+      .option-icon {
+        color: #fff;
+      }
+    }
+  }
+}

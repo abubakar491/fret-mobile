@@ -1,0 +1,60 @@
+<div class="discussions-list">
+  <ion-header>
+    <ion-toolbar color="freterium-color-blue-700">
+      <ion-buttons class="discussions-list-back-btn" slot="start">
+        <ion-back-button defaultHref="orders"></ion-back-button>
+      </ion-buttons>
+      <ion-title class="ion-text-center">{{ 'mobile.discussionsList.title' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-no-padding discussions-list-content">
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content pullingIcon="caret-down-outline"
+        pullingText="{{ 'mobile.discussionsList.pullToRefresh' | translate }}" refreshingSpinner="crescent"
+        refreshingText="Chargement...">
+      </ion-refresher-content>
+    </ion-refresher>
+
+    <div *ngIf="discussions && !discussions?.length">
+      <h4 class="ion-text-center">
+        {{ 'mobile.discussionsList.emptyList' | translate}}
+      </h4>
+    </div>
+
+    <ion-list *ngIf="discussions?.length" class="ion-no-padding list">
+      <ion-item *ngFor="let discussion of discussions; let i = index" class="discussion"
+        [class.unread]="discussion?.seen === '0'" (click)="openDiscussion(discussion?.order)">
+        <div class="ion-margin-vertical ion-padding-start">
+          <h2 class="ion-no-margin">
+            <span class="from-to">{{ discussion.from }}<span class="to-text">&rarr;</span>{{ discussion.to }}</span>
+          </h2>
+          <h3 class="ion-no-margin">
+            <span class="discussion-order-ref">{{ discussion.ref }}</span>
+          </h3>
+          <p class="ion-no-margin">
+            <span>{{ discussion?.user }} :</span>
+            <ion-icon *ngIf="discussion?.text === '' && discussion?.type === 'A'" class="text-color-red" name="mic">
+            </ion-icon>
+            <ion-icon *ngIf="discussion?.text === '' && discussion?.type === 'P'" class="text-color-red" name="camera">
+            </ion-icon>
+            <ion-icon *ngIf="discussion?.type === 'I'" class="text-color-red" name="warning">
+            </ion-icon>
+            
+            <span *ngIf="discussion?.type === 'I'" [class]="'message-content ' + discussion?.type">
+              <span class="issue-type" *ngIf="discussion?.text2?.type?.length">
+                {{ discussion?.text2?.type | translate }}
+              </span>
+              <span class="issue-reason" *ngIf="discussion?.text2?.reason?.length"> : {{ discussion?.text2?.reason
+                }}</span>
+            </span>
+
+            {{ (discussion?.text !== '' && discussion?.type !== 'I') ? discussion?.text : ((discussion?.type === 'P')
+            ? 'Photo' : ((discussion?.type === 'A') ? 'Audio' : '')) }}
+          </p>
+        </div>
+        <span class="ion-no-margin discussion-received" slot="end">{{ moment(discussion?.date).fromNow() }}</span>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</div>

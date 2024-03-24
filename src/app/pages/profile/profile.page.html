@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar color="freterium-color-blue-700">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'mobile.profile.myProfile' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div>
+    <img src="assets/images/defaultProfile2.png">
+  </div>
+
+  <ion-list>
+    <ion-item>
+      <ion-label>
+        {{ _user.firstname }} {{ _user.lastname }}
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        {{ _user.mobile }}
+      </ion-label>
+    </ion-item>
+    <!-- <ion-item (click)="changeLanguge()">
+      <ion-label>
+        {{ 'mobile.profile.language' | translate }}
+      </ion-label>
+      <ion-button fill="clear" slot="end">{{ _currentLang }}</ion-button>
+    </ion-item> -->
+
+    <!-- <ion-item>
+      <ion-label>{{ 'mobile.profile.language' | translate }}</ion-label>
+      <ion-segment (ionChange)="changeLanguge($event)" mode="ios" value="{{_currentLang}}">
+        <ion-segment-button value="en">
+          <ion-label>English</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="fr">
+          <ion-label>Français</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="id">
+          <ion-label>Indonesia</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="ar">
+          <ion-label>عربي</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-item> -->
+
+    
+    <ion-item (click)="changeLanguge()">
+      <ion-label>{{ 'mobile.profile.language' | translate }}</ion-label>
+      <ion-note slot="end">{{currentLangText}}</ion-note>
+    </ion-item>
+
+    <!-- <ion-item (click)="logout()">
+      <ion-label color="danger">Déconnexion</ion-label>
+    </ion-item> -->
+
+  </ion-list>
+
+</ion-content>

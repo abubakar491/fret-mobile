@@ -1,0 +1,255 @@
+ion-slides {
+  display: block;
+  width: 100%;
+  height: calc(290px);
+
+  .swiper-container {
+    overflow: visible;
+  }
+
+  .swiper-pagination.swiper-pagination-bullets {
+    bottom: 0px;
+  }
+
+  .swiper-slide {
+    align-items: start;
+  }
+}
+
+ion-item {
+  --ion-item-background: transparent;
+}
+
+.btn-dicussions {
+  font-size: 20px;
+}
+
+.status-icon {
+  border-radius: 50%;
+
+  img {
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    margin: 5px auto;
+    border-radius: 0px;
+    display: block;
+  }
+
+  &.status-0 {
+    background-color: var(--freterium-color-orange-600);
+    padding-top: 2px;
+  }
+
+  &.status-1 {
+    background-color: var(--freterium-color-green-600);
+    padding-top: 3px;
+  }
+
+  &.status-2 {
+    background-color: var(--freterium-color-green-600);
+    padding-top: 3px;
+  }
+
+  &.status-3 {
+    background-color: var(--freterium-color-green-600);
+  }
+
+  &.status-4 {
+    background-color: var(--freterium-color-green-600);
+    padding-top: 3px;
+  }
+
+  &.status-41 {
+    background-color: var(--freterium-color-orange-600);
+    padding-top: 2px;
+  }
+
+  &.status-5 {
+    background-color: var(--freterium-color-green-600);
+  }
+
+  &.status-6 {
+    background-color: var(--freterium-color-green-600);
+  }
+
+  &.status-7 {
+    background-color: var(--freterium-color-green-600);
+  }
+
+  &.status-71 {
+    background-color: var(--freterium-color-orange-600);
+    padding-top: 2px;
+  }
+}
+
+ion-card-content {
+  .card-order-grid {
+    position: relative;
+
+    .icon-arrow-right {
+      position: absolute;
+      right: 0px;
+    }
+
+    .location-name {
+      font-weight: bold;
+      font-size: 20px;
+      text-transform: uppercase;
+
+      &.location-name-active {
+        &::before {
+          content: "";
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+          background-color: var(--freterium-color-green-600);
+          margin-right: 5px;
+          margin-bottom: 2px;
+          border-radius: 50%;
+          animation: blinker 1s linear infinite;
+        }
+      }
+    }
+
+    .location-time {
+      font-size: 16px;
+    }
+  }
+}
+
+.card-order-active {
+  border: 2px solid;
+  border-color: #0da3e0 !important;
+}
+
+.card-order-inactive {
+  background-color: #c5c5c529;
+
+  ion-item {
+    background-color: #c5c5c529;
+  }
+}
+
+.btn-action {
+  background-color: #0da3df;
+  color: #fff;
+  position: absolute;
+  right: -10px;
+  bottom: 0px;
+  padding: 7px 12px;
+  margin: 0px;
+  height: initial;
+  font-size: 11px;
+  border-radius: 0px;
+  width: 76px;
+
+  &.activated {
+    background-color: #0da3df;
+  }
+}
+
+.card-order {
+  &.highlight {
+    background-color: #c2dbff !important;
+
+    .item {
+      background-color: #c2dbff !important;
+    }
+  }
+
+  &.loading-order {
+    opacity: 0.3;
+  }
+}
+
+#page-filter {
+  margin: -16px;
+  width: 100vw;
+  position: sticky;
+  top: -16px;
+  z-index: 100;
+
+  .filter-action {
+    margin-left: 15px;
+    float: right;
+    text-align: center;
+    margin-bottom: -13px;
+    margin-top: -5px;
+
+    span {
+      font-size: 10px;
+      display: block;
+    }
+  }
+}
+
+.popover-ios {
+  .popover-content {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+.qr-container {
+  text-align: center;
+  margin-top: 50px;
+
+  span {
+    display: block;
+    max-width: 220px;
+    margin: auto;
+    color: #555;
+  }
+}
+
+.search-control {
+  width: 220px;
+  font-size: 14px;
+  padding: 0px 2px;
+  border: 0px solid #a9a7a7;
+  border-radius: 1px;
+
+  .text-input {
+    padding: 0px;
+    margin: 0px;
+  }
+}
+
+.user-initials {
+  display: block;
+  width: 25px;
+  height: 25px;
+  background-color: #fff;
+  text-align: center;
+  line-height: 25px;
+  border-radius: 50%;
+  color: #011d67;
+  padding: 0px;
+  font-size: 11px;
+  margin: auto;
+}
+
+.company-name {
+  display: block;
+  text-align: center !important;
+  font-weight: normal;
+  color: #0ea3e1;
+  text-transform: capitalize;
+  font-size: 11px;
+}
+
+ion-toolbar {
+  ion-title {
+    text-align: left;
+    padding-left: 16px;
+  }
+
+  ion-icon {
+    font-size: 24px;
+  }
+
+  img {
+    height: 24px;
+  }
+}

@@ -1,0 +1,120 @@
+<!-- Select vehicle -->
+<ng-container *ngIf="currentSection === 'selectVehicle'">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title class="ion-text-left">
+        {{ 'mobile.text.vehicles_list' | translate }}
+      </ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="close()">
+          <ion-icon name="close-circle"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-padding">
+    <ion-text>
+      <h6>{{ 'mobile.breakdowns.select_vehicle' | translate }}</h6>
+    </ion-text>
+
+    <ion-text class="ion-text-center" *ngIf="vehicles?.length === 0 && !loadingVehicles">
+      <p class="non-available">{{ 'mobile.breakdowns.no_vehicles' | translate }}</p>
+    </ion-text>
+
+    <ion-list class="radio-list">
+      <div *ngFor="let vehicle of vehicles" class="input-container">
+        <input [id]="'input' + vehicle.id" [disabled]="!vehicle.enabled" type="radio" name="vehicle"
+          [(ngModel)]="breakdownData.vehicle" [value]="vehicle.uuid">
+        <ion-text><label [class.disabled]="!vehicle.enabled"
+            [for]="'input' + vehicle.id">{{vehicle.name}}</label></ion-text>
+      </div>
+    </ion-list>
+
+    <ion-button [disabled]="!breakdownData.vehicle" expand="block"
+      (click)="currentSection = 'selectBreakdownReason'">{{'mobile.text.continue' | translate}}</ion-button>
+  </ion-content>
+</ng-container>
+
+
+<!-- Select breakdown reason -->
+<ng-container *ngIf="currentSection === 'selectBreakdownReason'">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title class="ion-text-left">
+        {{ 'mobile.text.breakdown' | translate }}
+      </ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="backToVehicleSection()">
+          <ion-icon name="close-circle"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-padding">
+    <ion-text>
+      <h6>{{ 'mobile.breakdowns.select_reason' | translate }}</h6>
+    </ion-text>
+
+    <ion-list class="radio-list">
+      <div *ngFor="let bReason of breakdownReasons" class="input-container">
+        <input [id]="'input' + bReason" type="radio" name="b-reason" [(ngModel)]="breakdownData.breakdown"
+          [value]="bReason">
+        <ion-text><label [for]="'input' + bReason">{{bReason | translate}}</label></ion-text>
+      </div>
+    </ion-list>
+
+    <ion-button [disabled]="!breakdownData.breakdown" expand="block" id="open-breakdown-details-modal">{{ 'mobile.text.continue' | translate }}</ion-button>
+
+
+    <!-- Breakdown reason details modal -->
+    <ion-modal class="custom-dialog" trigger="open-breakdown-details-modal" #breakdownDetailsModal>
+      <ng-template>
+        <div class="wrapper">
+          <h1>{{breakdownData.breakdown | translate}}</h1>
+
+          <ion-list>
+            <ion-item>
+              <ion-textarea autofocus="true" placeholder="{{ 'mobile.text.description' | translate }}" [rows]="8"
+                [(ngModel)]="breakdownData.description"></ion-textarea>
+            </ion-item>
+          </ion-list>
+
+          <div class="modal-actions">
+            <ion-button color="light" class="cancel-btn" (click)="closeModal(breakdownDetailsModal)">{{'mobile.texts.cancel' |
+              translate}}</ion-button>
+            <span class="stretch"></span>
+            <ion-button (click)="closeModal(breakdownDetailsModal); isConfirmationModalOpen = true">{{ 'mobile.text.continue' |
+              translate }}</ion-button>
+          </div>
+        </div>
+      </ng-template>
+    </ion-modal>
+
+
+    <!-- Confirmation modal -->
+    <ion-modal class="custom-dialog confirm-dialog" #confirmationModal [isOpen]="isConfirmationModalOpen"
+      (didDismiss)="isConfirmationModalOpen = false">
+      <ng-template>
+        <div class="wrapper">
+          <h1>{{ 'mobile.text.confirmation' | translate }}</h1>
+
+          <ion-text class="ion-text-center">
+            <p>{{ 'mobile.breakdowns.confirmation_details' | translate }}</p>
+          </ion-text>
+
+          <ion-button color="danger" expand="block" (click)="submit(confirmationModal)">{{ 'mobile.text.yes_confirm' |
+            translate}}</ion-button>
+          <ion-button color="light" expand="block" (click)="closeModal(confirmationModal)">{{'mobile.text.no_cancel' |
+            translate}}</ion-button>
+
+        </div>
+      </ng-template>
+    </ion-modal>
+
+
+  </ion-content>
+
+
+</ng-container>

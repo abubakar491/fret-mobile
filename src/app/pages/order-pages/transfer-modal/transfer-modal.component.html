@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar color="freterium-color-blue-700">
+    <ion-buttons slot="start" class="edit-order-back-btn">
+      <ion-button (click)="close()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ 'mobile.Transfer_Modal.TransferOrders' | translate}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+
+  <div  *ngIf="!isTransferDone" class="ion-text-center">
+
+    <ngx-qrcode [elementType]="QRType" [value]="QRvalue" [errorCorrectionLevel]="QRerrorCorrectionLevel"
+      [width]="QRWidth" [margin]="QRMargin">
+    </ngx-qrcode>
+    <br>
+    <p>
+      {{ 'mobile.Transfer_Modal.ScanCodeFromYourDriverAppllication' | translate}}
+    </p>
+  </div>
+
+  <div  *ngIf="isTransferDone" class="ion-text-center">
+   
+    <img class="success-icon" src="assets/images/icons/icon-check-w.png" alt="">
+    <br>
+    <br>
+    <p>
+      {{ 'mobile.Transfer_Modal.transferDoneWithSuccess' | translate}}
+    </p>
+  </div>
+
+</ion-content>
+<ion-footer *ngIf="isTransferDone" class="ion-no-border ion-padding">
+  <ion-button (click)="close()" expand="block" size="large">
+    {{ 'mobile.Transfer_Modal.close' | translate}}
+  </ion-button>
+</ion-footer>

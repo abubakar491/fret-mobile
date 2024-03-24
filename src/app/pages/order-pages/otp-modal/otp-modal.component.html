@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar color="freterium-color-blue-700">
+    <ion-buttons slot="start" class="edit-order-back-btn">
+      <ion-button (click)="close()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ order?.ref }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <h1>
+    {{ 'mobile.OTP_Modal.ENTER_CODE' | translate}}
+  </h1>
+  <br>
+  <p>
+    {{ 'mobile.OTP_Modal.WE_VE_SENT_4_DIGITS' | translate}}
+  </p>
+  <br>
+  <ion-row>
+    <ion-col>
+      <ion-input class="ion-text-center ion-no-padding otp-input" [ngClass]="OtpError?'otp-error':''" #otp1
+        required="true" maxLength="1"  type="number" [(ngModel)]="OTP[0]" (keyup)="otpController($event,otp2,'')">
+      </ion-input>
+    </ion-col>
+    <ion-col>
+      <ion-input class="ion-text-center ion-no-padding otp-input" [ngClass]="OtpError?'otp-error':''" #otp2
+        required="true" maxLength="1"  type="number" [(ngModel)]="OTP[1]" (keyup)="otpController($event,otp3,otp1)">
+      </ion-input>
+    </ion-col>
+    <ion-col>
+      <ion-input class="ion-text-center ion-no-padding otp-input" [ngClass]="OtpError?'otp-error':''" #otp3
+        required="true" maxLength="1"  type="number" [(ngModel)]="OTP[2]" (keyup)="otpController($event,otp4,otp2)">
+      </ion-input>
+    </ion-col>
+    <ion-col>
+      <ion-input class="ion-text-center ion-no-padding otp-input" [ngClass]="OtpError?'otp-error':''" #otp4
+        required="true" maxLength="1"  type="number" [(ngModel)]="OTP[3]" (keyup)="otpController($event,'',otp3)">
+      </ion-input>
+    </ion-col>
+  </ion-row>
+  <br>
+  <ion-text *ngIf="OtpError" color="danger">
+    {{ 'mobile.OTP_Modal.OTP_ERROR' | translate}}
+  </ion-text>
+</ion-content>
+<ion-footer class="ion-no-border ion-padding">
+  <ion-button *ngIf="!resendIn" (click)="resendOTP()" expand="block" fill="clear">
+    {{ 'mobile.OTP_Modal.RESEND_OTP' | translate}}
+  </ion-button>
+  <ion-button *ngIf="resendIn" expand="block" fill="clear" disabled>
+    {{ 'mobile.OTP_Modal.RESEND_CODE_IN' | translate}}
+    {{resendIn}}
+  </ion-button>
+  <br>
+  <ion-button (click)="submit()" expand="block" size="large" [disabled]="OTP.join('').length < 4">
+    {{ 'mobile.OTP_Modal.NEXT' | translate}}
+  </ion-button>
+</ion-footer>

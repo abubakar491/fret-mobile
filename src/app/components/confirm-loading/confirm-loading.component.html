@@ -1,0 +1,154 @@
+<ion-header>
+  <ion-toolbar color="freterium-color-blue-700">
+    <ion-buttons slot="start" class="edit-order-back-btn">
+      <ion-button (click)="close()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title *ngIf="type == 'POD'">
+      {{ 'mobile.confirmLoading.podTitle' | translate }}
+    </ion-title>
+
+    <ion-title *ngIf="type == 'POL'">
+      {{ 'mobile.confirmLoading.polTitle' | translate }}
+    </ion-title>
+    <ion-buttons slot="end" *ngIf="!isScannerActive">
+      <ion-button (click)="openScanner()">
+        <ion-icon name="barcode-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div>
+    <h2>
+      <div *ngIf="type == 'POD'" class="popup-title">
+        <ion-icon name="document-text"></ion-icon>
+        {{ 'mobile.confirmLoading.podTitle' | translate }}
+      </div>
+    </h2>
+    <div>
+      <div *ngIf="type == 'POL'" class="popup-title">
+        <ion-icon name="document"></ion-icon>
+        {{ 'mobile.confirmLoading.polTitle' | translate }}
+      </div>
+    </div>
+  </div>
+  <ion-row>
+    <ion-col *ngFor="let POD of PODs let i = index">
+      <div class="pod-choice">
+        <div class="with-pod">
+          <img [src]="POD" alt="">
+          <ion-icon class="close-icon" name="close" (click)="removePicture(i)"></ion-icon>
+        </div>
+      </div>
+    </ion-col>
+    <ion-col>
+      <div class="pod-choice">
+        <div class="with-pod" (click)="takePicture(type)">
+          <ion-icon class="add-icon" name="add"></ion-icon>
+        </div>
+      </div>
+    </ion-col>
+    <ion-col size="12">
+      <div *ngIf="PODs?.length" class="ion-text-center pods-counter">
+        {{ PODs?.length }}
+        {{ ((PODs?.length === 1) ? 'mobile.confirmLoading.photo' : 'mobile.confirmLoading.photos') | translate }}
+        {{ 'mobile.confirmLoading.toSend' | translate }}
+      </div>
+      <div *ngIf="PODs?.length === 0" class="ion-text-center pods-counter">
+        {{ 'mobile.confirmLoading.clickToTakePhoto' | translate }}
+      </div>
+    </ion-col>
+  </ion-row>
+
+  <ng-container *ngIf="!showOrderItems">
+    <ion-list>
+      <ion-item *ngFor="let productLineItem of productLineItems; let i = index">
+        <ion-checkbox (click)="toggleDelivered(i)" [(ngModel)]="productLineItem.checked"
+          [indeterminate]="productLineItem.indeterminate" slot="start"></ion-checkbox>
+        <ion-label class="ion-text-wrap">
+          {{productLineItem.name}}
+        </ion-label>
+        <ion-text slot="end" class="counter">
+          <div class="cmp-counter">
+            <div class="minus">
+              <ion-button fill="clear" color="light" size="small" class="ion-no-margin"
+                [disabled]="productLineItem.selectedQuantity <= 0" (click)="updateQuantity(i, -1)">
+                <ion-icon slot="icon-only" name="remove"></ion-icon>
+              </ion-button>
+            </div>
+            <div class="num">
+              <ion-input class="ion-input-no-um ion-no-padding ion-text-center" step="1" (keyup)="formatQuantity(i)"
+                onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Period','NumpadDecimal'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'"
+                [(ngModel)]="productLineItem.selectedQuantity"
+                (ionFocus)="productLineItem.selectedQuantity==0 ? productLineItem.selectedQuantity=null:null"
+                (ionBlur)="productLineItem.selectedQuantity==null ? productLineItem.selectedQuantity=0:null" type="number"
+                maxlength="3">
+              </ion-input>
+            </div>
+            <div class="plus">
+              <ion-button fill="clear" color="light" size="small" class="ion-no-margin"
+                [disabled]="productLineItem.selectedQuantity >= productLineItem.expectedQuantity" (click)="updateQuantity(i, 1)">
+                <ion-icon slot="icon-only" name="add"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+          <span class="padding-left">
+            /{{productLineItem.expectedQuantity}}
+          </span>
+        </ion-text>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+</ion-content>
+
+<ion-footer class="ion-no-border ion-padding">
+  <ng-container *ngIf="type === 'POD'">
+    <ion-button [disabled]="!PODs.length && driver?.client?.forcePOD"
+      (click)="sendPODandChangeStatusAll(null, type)" expand="block" size="large">
+      {{ 'mobile.confirmLoading.delivery' | translate }}
+    </ion-button>
+  </ng-container>
+  <ng-container *ngIf="type === 'POL'">
+    <ion-button [disabled]="!PODs.length && driver?.client?.forcePOL" (click)="sendPODandChangeStatus(null, type)"
+      expand="block" size="large">
+      {{ 'mobile.confirmLoading.loaded' | translate }}
+    </ion-button>
+  </ng-container>
+</ion-footer>
+
+<!--
+<ion-row *ngIf="type === 'POD'">
+  <ion-col *ngIf="!showConfirmSendPOD" size="5" push="1">
+    <ion-button class="btn-action-blue" expand="block" [disabled]="!PODs.length && driver?.client?.forcePOD"
+      (click)="sendPODandChangeStatusAll(null, type)">
+      {{ 'mobile.confirmLoading.deliveredAll' | translate }}
+    </ion-button>
+  </ion-col>
+  <ion-col *ngIf="!showConfirmSendPOD" size="5" push="1">
+    <ion-button [disabled]="!PODs.length && driver?.client?.forcePOD"
+      (click)="sendPODandChangeStatusPartial(true, type)" class="btn-action-red">
+      {{ 'mobile.confirmLoading.deliveredPartial' | translate }}
+    </ion-button>
+  </ion-col>
+  <ion-col *ngIf="showConfirmSendPOD" size="12" class="ion-text-center">
+    <ion-button [disabled]="!PODs.length && driver?.client?.forcePOD"
+      (click)="confirmSendPODandChangeStatusPartial(true, type)" class="btn-action-red w-100">
+      {{ 'mobile.confirmLoading.confirmDeliveredPartial' | translate }}
+    </ion-button>
+  </ion-col>
+</ion-row>
+
+<ion-row *ngIf="type === 'POL'">
+  <ion-col size="12" class="ion-text-center">
+    <span class="delivery-type">{{ 'mobile.confirmLoading.loading' | translate }}</span>
+  </ion-col>
+  <ion-col size="12" class="ion-text-center">
+    <ion-button class="btn-action-blue" expand="block" [disabled]="!PODs.length && driver?.client?.forcePOL"
+      (click)="sendPODandChangeStatus(null, type)">
+      {{ 'mobile.confirmLoading.loaded' | translate }}
+    </ion-button>
+  </ion-col>
+</ion-row> -->

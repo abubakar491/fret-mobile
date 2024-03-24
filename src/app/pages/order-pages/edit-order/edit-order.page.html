@@ -1,0 +1,151 @@
+<ng-container *ngIf="order">
+  <ion-header>
+    <ion-toolbar color="freterium-color-blue-700">
+      <ion-buttons slot="start" class="edit-order-back-btn">
+        <ion-back-button defaultHref="orders"></ion-back-button>
+      </ion-buttons>
+      <ion-title class="ion-text-center">{{ order?.ref }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-padding-bottom">
+    <div *ngIf="loading" class="loader">
+      <ion-spinner></ion-spinner>
+    </div>
+    <div class="edit-order-avatar ion-text-center">
+      <ion-avatar>
+        <div>
+          <img [class.moving-icon]="order?.status === STATUS.ONWAY_LOADING || order?.status === STATUS.ONWAY_DELIVERY"
+            [src]="order?.STATUS_ICON">
+        </div>
+        <div>{{ 'mobile.editOrder.statusLabel.' + order?.STATUS_TEXT | translate }}</div>
+      </ion-avatar>
+    </div>
+
+    <ion-card class="ion-padding ion-text-center edit-order-card">
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <h5 class="ion-text-uppercase edit-order-card-location">
+                {{ (order?.status < STATUS.LOADED) ? order?.from?.name : order?.to?.name }} </h5>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col>
+              <span class="edit-order-card-start-time">{{ startTime }}</span>
+            </ion-col>
+          </ion-row>
+
+          <ion-row *ngIf="order?.status < STATUS.LOADED">
+            <ion-col [ngSwitch]="true">
+              <div *ngSwitchCase="order?.status < STATUS.ONWAY_LOADING" [class]="'main-action ' + nextStatusBtnClass"
+                (click)="confirmStatusChange(1)" tappable>
+                <img [src]="statusReferences.get('ONWAY_LOADING').icon">
+                <div>{{ statusReferences.get('ONWAY_LOADING').text | translate }}</div>
+              </div>
+              <div *ngSwitchCase="order?.status < orderStatus.ONSITE_LOADING"
+                [class]="'main-action ' + nextStatusBtnClass" (click)="confirmStatusChange(2)" tappable>
+                <img [src]="statusReferences.get('ONSITE_LOADING').icon">
+                <div>{{ statusReferences.get('ONSITE_LOADING').text | translate }}</div>
+              </div>
+              <div *ngSwitchCase="order?.status < orderStatus.LOADED" [class]="'main-action ' + nextStatusBtnClass"
+                (click)="confirmStatusChange(3)" tappable>
+                <img [src]="statusReferences.get(4).icon">
+                <div>{{ statusReferences.get(4).text | translate }}</div>
+              </div>
+            </ion-col>
+          </ion-row>
+
+          <ion-row *ngIf="order?.status >= orderStatus.LOADED && order?.status < orderStatus.DELIVERED">
+            <ion-col size="12">
+              <div *ngIf="order?.status < orderStatus.ONWAY_DELIVERY" [class]="'main-action ' + nextStatusBtnClass"
+                (click)="confirmStatusChange(4)" tappable>
+                <img [src]="statusReferences.get(5).icon">
+                <div>{{ statusReferences.get(5).text | translate }}</div>
+              </div>
+              <div *ngIf="order?.status < orderStatus.ONSITE_DELIVERY" [class]="'main-action ' + nextStatusBtnClass"
+                (click)="confirmStatusChange(5)" tappable>
+                <img [src]="statusReferences.get(6).icon">
+                <div>{{ statusReferences.get(6).text | translate }}</div>
+              </div>
+              <div *ngIf="order?.status < orderStatus.DELIVERED && (order?.payment_mode && !order?.cargoPayment)"
+                [class]="'main-action bg-dark-blue'" tappable (click)="orderPayments()">
+                <ion-icon name="cash"></ion-icon>
+                <div>{{ order?.units_value }} Dhs</div>
+              </div>
+              <div *ngIf="order?.status < orderStatus.DELIVERED  && (!order?.payment_mode || order?.cargoPayment)"
+                [class]="'main-action ' + nextStatusBtnClass" (click)="confirmStatusChange(6)" tappable>
+                <img [src]="statusReferences.get(7).icon">
+                <div>{{ statusReferences.get(7).text | translate }}</div>
+              </div>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col size="12">
+              <ion-button *ngIf="order?.NEXT_STATUS <= STATUS.LOADED || order?.NEXT_STATUS === 'ONSITE_LOADING_STARTED'"
+                class="btn-action btn-action-not-loaded" color="danger" (click)="showReturnReasonScreen('not_loaded')">
+                {{ 'mobile.editOrder.statusLabel.NOT_LOADED' | translate }}
+              </ion-button>
+              <ion-button *ngIf="order?.NEXT_STATUS > STATUS.LOADED || order?.NEXT_STATUS === 'ONSITE_DELIVERY_STARTED'"
+                class="btn-action btn-action-returned" color="danger" (click)="showReturnReasonScreen('returned')">
+                {{ 'mobile.editOrder.statusLabel.RETURNED' | translate }}
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </ion-content>
+
+  <ion-footer class="edit-order-footer">
+    <ion-grid class="ion-no-padding card-order-grid">
+      <ion-row>
+        <ion-col class="ion-text-center">
+          <ion-button class="footer-action rounded bg-white" (click)="showOrderDetail()">
+            <ion-icon class="text-color-blue-600" name="list"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <ion-button class="footer-action rounded" [disabled]="!order?.to?.contact?.phone_2" (click)="showMakeCall(order?.to?.contact?.phone_2)">
+            <ion-icon name="call"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <ion-button *ngIf="order?.status <  STATUS.LOADED"
+            [disabled]="!order?.from?.geo?.lat || !order?.from?.geo?.lng "
+            class="footer-action rounded bg-white" (click)="launchMap('from')">
+            <ion-icon class="text-color-blue-600" name="navigate"></ion-icon>
+          </ion-button>
+          <ion-button *ngIf="order?.status >=  STATUS.LOADED"
+            [disabled]="!order?.to?.geo?.lat || !order?.to?.geo?.lng "
+            class="footer-action rounded bg-white" (click)="launchMap('to')">
+            <ion-icon class="text-color-blue-600" name="navigate"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <ion-button class="footer-action rounded bg-btn-red" (click)="reportIssue()">
+            <ion-icon name="alert"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-fab class="chat">
+            <ion-fab-button class="footer-action bg-white">
+              <ion-icon name="chatbubbles"></ion-icon>
+            </ion-fab-button>
+            <ion-fab-list side="top">
+              <ion-button class="footer-action rounded bg-blue" (click)="takePicture()">
+                <ion-icon name="camera"></ion-icon>
+              </ion-button>
+              <ion-button class="footer-action rounded bg-blue" (click)="openChat()">
+                <ion-icon name="chatbox-ellipses"></ion-icon>
+              </ion-button>
+            </ion-fab-list>
+          </ion-fab>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-footer>
+</ng-container>

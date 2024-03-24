@@ -1,0 +1,31 @@
+image: docker:latest
+
+build:
+  image: beevelop/ionic:update-ionic-6.16-v2
+  services:
+    - docker:dind
+  script:
+
+    - npm ci
+    - npm run build-release
+    - cd android && ./gradlew installDebug && cd ..
+
+
+
+
+
+# docker pull beevelop/ionic:update-ionic-6.16
+# docker run -it beevelop/ionic:update-ionic-6.16 /bin/bash
+# docker build -t beevelop/ionic:update-ionic-6.16 .
+
+
+
+# docker pull mingc/android-build-box
+# docker build -t mingc/android-build-box .
+# docker run -it mingc/android-build-box /bin/bash
+
+
+
+    
+
+    

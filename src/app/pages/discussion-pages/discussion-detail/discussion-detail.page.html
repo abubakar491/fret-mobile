@@ -1,0 +1,114 @@
+<div class="discussion-detail">
+  <ion-header>
+    <ion-toolbar color="freterium-color-blue-700">
+      <ion-buttons class="discussion-detail-back-btn" slot="start">
+        <ion-back-button defaultHref="orders"></ion-back-button>
+      </ion-buttons>
+      <ion-title class="ion-text-center">{{ 'mobile.discussionDetail.title' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-padding discussion-detail-content">
+    <div class="message-wrap">
+      <ng-container *ngFor="let msg of msgList">
+        <div
+          *ngIf="msg?.type !== messageTypes.ISSUE || (msg?.type === messageTypes.ISSUE && msg?.message?.type?.length)"
+          class="message" [class.message-photo]="msg?.type === 'P'" [class.message-audio]="msg?.type === 'A'"
+          [class.message-video]="msg?.type === 'V'" [class.message-text]="msg?.type === 'M'"
+          [class.message-issue]="msg?.type === 'I'" [class.left]=" msg.userId !== _user.id "
+          [class.right]="msg.userId === _user.id ">
+          <ion-spinner name="dots" *ngIf="msg.status === 'pending'"></ion-spinner>
+          <div class="msg-detail">
+            <div class="msg-info">
+              <p>{{ msg.userName }}&nbsp;•&nbsp;{{ msg.time | dateFormat : 'fr' : 'HH:mm' }}</p>
+            </div>
+            <div class="msg-content" [class.issue-message]="msg?.type === messageTypes.ISSUE">
+              <span class="triangle"></span>
+              <p class="line-breaker ">
+                <span *ngIf="msg?.type === messageTypes.ISSUE && msg?.message?.type?.length"
+                  [class]="'message-content ' + msg?.message?.type">
+                  <ion-icon name="warning" item-end></ion-icon>
+                  <span class="issue-type" *ngIf="msg?.message?.type?.length">{{ msg?.message?.type | translate }}</span>
+                  <span class="issue-reason" *ngIf="msg?.message?.reason?.length"> : {{ msg?.message?.reason }}</span>
+                </span>
+                <span *ngIf="msg?.type === messageTypes.TEXT" class="message-content" [innerHTML]="msg?.message"></span>
+                <span *ngIf="msg?.type === messageTypes.PHOTO">
+                  <img (click)="showPhoto(msg?.file, msg.userName , msg.time)" [src]="msg?.file" alt="PHOTO"
+                    WIDTH="300px">
+                  {{msg.message}}
+                </span>
+                <span *ngIf="msg?.type === messageTypes.AUDIO" class="message-content message-content-audio">
+                  <span *ngIf="msg?.id !== activeAudioFileID" class="audio-control audio-play"
+                    (click)="playAudio(msg?.id)">
+                    <ion-icon name="play"></ion-icon>
+                  </span>
+                  <span
+                    *ngIf="msg?.id === activeAudioFileID && (activeAudioFileState === 3 || activeAudioFileState === 4)"
+                    class="audio-control audio-play" (click)="playAudio(msg?.id)">
+                    <ion-icon name="play"></ion-icon>
+                  </span>
+                  <span
+                    *ngIf="msg?.id === activeAudioFileID && (activeAudioFileState === 1 || activeAudioFileState === 2)"
+                    class="audio-control audio-pause" (click)="pauseAudio()">
+                    <ion-icon name="pause"></ion-icon>
+                  </span>
+                  <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 55 55" width="30" height="30">
+                    <path fill="#FFF" d="M0 0h55v55H0V0z"></path>
+                    <path fill="#01acac"
+                      d="M27.5 16c-5.6 0-10 4.4-10 10v7.8c0 1.9 1.4 3.3 3.3 3.3h3.3v-8.9h-4.4V26c0-4.3 3.4-7.8 7.8-7.8s7.8 3.4 7.8 7.8v2.2h-4.4v8.9h3.3c1.9 0 3.3-1.4 3.3-3.3V26c0-5.6-4.4-10-10-10z">
+                    </path>
+                  </svg>
+                  <span class="active-audio-past-time">
+                    <span *ngIf="msg?.id !== activeAudioFileID" class="current-past-time" [style.width]="'0%'"></span>
+                    <span *ngIf="msg?.id === activeAudioFileID" class="current-past-time"
+                      [style.width]="activeAudioPastTime + '%'"></span>
+                  </span>
+                  <span
+                    *ngIf="msg?.id === activeAudioFileID && (activeAudioFileState >= 2 && activeAudioFileState <= 4)"
+                    class="current-time">{{activeAudioCurrentTime}}</span>
+                  <span
+                    *ngIf="activeAudioDuration !== 'NaN:NaN' && msg?.id === activeAudioFileID && (activeAudioFileState >= 2 && activeAudioFileState <= 4)"
+                    class="current-audio-file-duration">{{ activeAudioDuration }}</span>
+                </span>
+              </p>
+              <span class="msg-time">{{msg.time | dateFormat : 'fr' : 'HH:mm'}}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </ion-content>
+
+  <ion-footer no-border [style.height]="showOptions ? footerWithOption_height + 'px' : footer_height + 'px'">
+    <div class="input-wrap">
+      <textarea #chat_input placeholder="{{ 'mobile.discussionDetail.sendMessage' | translate }}" [(ngModel)]="editorMsg" (focusin)="onFocus()"
+        (keyup)="adjustTextarea($event)" (keyup.enter)="sendMsg()" rows="1">
+      </textarea>
+      <ion-button class="footer-btn" fill="clear" (click)="sendMsg()" *ngIf="editorMsg?.length">
+        <ion-icon slot="icon-only" name="send" size="large"></ion-icon>
+      </ion-button>
+      <button class="footer-btn" fill="clear" (click)="showSendOptions()"
+        *ngIf="!editorMsg?.length">
+        <ion-icon slot="icon-only" name="add-outline" size="large"></ion-icon>
+      </button>
+    </div>
+    <div id="chat-options" *ngIf="showOptions">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6">
+            <div (click)="takePicture()" tappable class="action action-send-photo ripple">
+              <ion-icon class="option-icon" name="camera"></ion-icon>
+              <div class="option-title">{{ 'mobile.discussionDetail.photo' | translate }}</div>
+            </div>
+          </ion-col>
+          <ion-col size="6">
+            <div (click)="reportProblemPopover($event)" tappable class="action action-send-problem ripple">
+              <ion-icon class="option-icon" name="alert-circle"></ion-icon>
+              <div class="option-title">{{ 'mobile.discussionDetail.problem' | translate }}</div>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+  </ion-footer>
+</div>

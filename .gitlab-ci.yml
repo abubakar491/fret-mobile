@@ -1,0 +1,142 @@
+image: docker
+
+variables:
+  GIT_SSL_NO_VERIFY: "true"
+
+
+services:
+  - docker:dind
+
+stages:
+- builder-image
+- build
+- slack
+- publish
+
+before_script:
+  - export VERSION_NAME=$(echo $CI_COMMIT_TAG | sed  's/v//' | sed 's/-staging//')
+  - export VERSION_BUILD=$CI_PIPELINE_IID
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
+
+
+
+update-builder-image:
+  stage: builder-image
+  script:
+  - echo $CI_COMMIT_BRANCH
+  - echo $CI_COMMIT_TAG
+  - docker pull $CI_REGISTRY_IMAGE/builder:latest || true
+  - docker build --cache-from $CI_REGISTRY_IMAGE/builder:latest --tag $CI_REGISTRY_IMAGE/builder:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE/builder:latest .
+  - docker push $CI_REGISTRY_IMAGE/builder:$CI_COMMIT_SHA
+  - docker push $CI_REGISTRY_IMAGE/builder:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "release"
+      changes:
+        - Dockerfile
+
+
+build-dev:
+  stage: build
+  script:
+  - export VERSION_NAME="2.0.0" ; echo $VERSION_NAME
+  - export VERSION_BUILD=$CI_PIPELINE_IID ; echo $VERSION_BUILD
+  - export BUNDLE_NAME="com.freterium.app.dev" ; echo $BUNDLE_NAME
+  - export APP_NAME="Freterium_Dev" ; echo $APP_NAME
+  - sh update_version.sh $VERSION_NAME $VERSION_BUILD $BUNDLE_NAME $APP_NAME $ANDROID_KEYPASS $WEBLATE_API_URL $WEBLATE_API_KEY
+  - docker run --rm -v $PWD:/workdir $CI_REGISTRY_IMAGE/builder sh -c "npm ci && npm run ci-build-development"
+  - mv android/app/build/outputs/apk/debug/app-debug.apk freterium-mobile-app-dev_2.0.$VERSION_BUILD.apk
+  artifacts:
+    paths:
+    - "*.apk"
+  only:
+    - master
+
+build-staging:
+  stage: build
+  script:
+  - export VERSION_NAME=$(echo $CI_COMMIT_TAG | sed  's/v//' | sed 's/-staging//') ; echo $VERSION_NAME
+  - export VERSION_BUILD=$CI_PIPELINE_IID ; echo $VERSION_BUILD
+  - export BUNDLE_NAME="com.freterium.app.staging" ; echo $BUNDLE_NAME
+  - export APP_NAME="Freterium_Staging" ; echo $APP_NAME
+  - sh update_version.sh $VERSION_NAME $VERSION_BUILD $BUNDLE_NAME $APP_NAME $ANDROID_KEYPASS $WEBLATE_API_URL $WEBLATE_API_KEY
+  - cat "$ANDROID_KEYSTORE_FILE" |base64 -d > freterium_mobile_app.keystore
+  - docker run --rm -v $PWD:/workdir -e ANDROID_KEYPASS=$ANDROID_KEYPASS $CI_REGISTRY_IMAGE/builder 
+    sh -c "npm ci && npm run ci-build-staging" 
+  - mv android/app/build/outputs/apk/release/app-release.apk freterium-mobile-app-staging_$VERSION_NAME.apk
+  - ls -la *.apk
+  artifacts:
+    paths:
+    - "*.apk"
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+-staging$/
+
+build-production:
+  stage: build
+  script:
+  - export VERSION_NAME=$(echo $CI_COMMIT_TAG | sed  's/v//' | sed 's/-staging//') ; echo $VERSION_NAME
+  - export VERSION_BUILD=$CI_PIPELINE_IID ; echo $VERSION_BUILD
+  - export BUNDLE_NAME="com.freterium.app" ; echo $BUNDLE_NAME
+  - export APP_NAME="Freterium" ; echo $APP_NAME
+  - sh update_version.sh $VERSION_NAME $VERSION_BUILD $BUNDLE_NAME $APP_NAME $ANDROID_KEYPASS $WEBLATE_API_URL $WEBLATE_API_KEY
+  - cat "$ANDROID_KEYSTORE_FILE" |base64 -d > freterium_mobile_app.keystore
+  - docker run --rm -v $PWD:/workdir -e ANDROID_KEYPASS=$ANDROID_KEYPASS $CI_REGISTRY_IMAGE/builder 
+    sh -c "npm ci && npm run ci-build-production" 
+  - mv android/app/build/outputs/apk/release/app-release.apk freterium-mobile-app_$VERSION_NAME.apk
+  - ls -la *.apk
+  artifacts:
+    paths:
+    - "*.apk"
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/ 
+
+publish-do-spaces:
+  stage: publish
+  script:
+  - pwd && ls -la 
+  - docker run --rm -v $PWD:/tmp -e DO_ACCESS_KEY=$DO_ACCESS_KEY -e DO_SECRET_KEY=$DO_SECRET_KEY python:3.9-alpine
+    sh -c "cd /tmp && pip install boto3 && python do_release_app.py freterium-mobile-app_$VERSION_NAME.apk"
+  - docker run --rm -e DIGITALOCEAN_ACCESS_TOKEN=$DIGITALOCEAN_ACCESS_TOKEN digitalocean/doctl 
+    compute cdn flush 4b310d2a-a948-4019-8cb3-266be1841ced
+  when: manual
+  allow_failure: false 
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/
+
+slack-dev:
+  stage: slack
+  script: 
+  - export VERSION_BUILD=$CI_PIPELINE_IID
+  - apk add --no-cache curl 
+  - curl -F title='New Dev Mobile App v'$VERSION_NAME --form-string channels=notif-development  -F token=$SLACK_CLI_TOKEN 
+    -F file=@freterium-mobile-app-dev_2.0.$VERSION_BUILD.apk -F filename=freterium-mobile-app-dev_2.0.$VERSION_BUILD.apk 
+    https://slack.com/api/files.upload
+  only:
+    - master
+
+slack-staging:
+  stage: slack
+  script: 
+  - export VERSION_NAME=$(echo $CI_COMMIT_TAG | sed  's/v//' | sed 's/-staging//')
+  - apk add --no-cache curl 
+  - pwd
+  - ls -la *.apk
+  - curl -F title='New Staging Mobile App v'$VERSION_NAME --form-string channels=notif-staging  -F token=$SLACK_CLI_TOKEN 
+    -F file=@freterium-mobile-app-staging_$VERSION_NAME.apk -F filename=freterium-mobile-app-staging_$VERSION_NAME.apk 
+    https://slack.com/api/files.upload
+
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+-staging$/
+
+slack-production:
+  stage: slack
+  script: 
+  - export VERSION_NAME=$(echo $CI_COMMIT_TAG | sed  's/v//')
+  - apk add --no-cache curl 
+  - pwd
+  - ls -la *.apk
+  - curl -F title='New Production Mobile App v'$VERSION_NAME --form-string channels=notif-production  -F token=$SLACK_CLI_TOKEN 
+    -F file=@freterium-mobile-app_$VERSION_NAME.apk -F filename=freterium-mobile-app_$VERSION_NAME.apk 
+    https://slack.com/api/files.upload
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/
+

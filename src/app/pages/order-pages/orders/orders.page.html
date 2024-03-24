@@ -1,0 +1,126 @@
+<ion-header>
+  <ion-toolbar color="freterium-color-blue-700">
+    <!-- <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons> -->
+    <ion-title>
+      <img start class="logo" width="130px" src="assets/images/logo_freterium.png">
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openQRScanner()">
+        <ion-icon slot="icon-only" name="qr-code"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goToDiscussions()">
+        <ion-icon slot="icon-only" name="chatbubbles"></ion-icon>
+      </ion-button>
+      <ion-button (click)="goToBreakDowns()">
+        <img src="assets/images/truck-remove.png" alt="remove truck">
+      </ion-button>
+      <ion-button (click)="userMenuPopover($event)">
+        <ion-icon slot="icon-only" name="person-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar color="freterium-color-blue-700">
+    <ion-searchbar #searchInput [(ngModel)]="searchText"
+      placeholder="{{ 'mobile.ordersListe.SearchByLocationOrReference' | translate}}"></ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="orders?.length" disabled>
+        <ng-container *ngIf="selectedItems?.length">
+          {{selectedItems?.length}} /
+        </ng-container>
+        {{orders?.length}} OT
+        <!-- <span *ngIf="!QRShow && selectedItems?.length">{{selectedItems?.length}} OT sélectionné{{(selectedItems?.length > 1) ? 's' : ''}}</span>
+        <span *ngIf="QRShow && selectedItems?.length">{{selectedItems?.length}} OT sélectionné{{(selectedItems?.length > 1) ? 's' : ''}} à transférer</span> -->
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content class="bg-light-gray ion-padding">
+
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content pullingText="{{ 'mobile.PULL_TO_REFRESH' | translate}}"></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button *ngIf="selectedItems?.length" (click)="transferOrders()" color="freterium-color-blue-700">
+      <ion-icon name="arrow-redo-sharp"></ion-icon>
+    </ion-fab-button>
+    <!-- For test -->
+    <!-- <ion-fab-button (click)="receiveTransferdOrdersTest()" color="danger">
+      <ion-icon name="qr-code"></ion-icon>
+    </ion-fab-button> -->
+  </ion-fab>
+
+  <div class="orders-list">
+    <div *ngIf="orders && !(orders | filter : 'orders' : '' : searchText)?.length">
+      <h4 class="ion-text-center">
+        {{ 'mobile.NO_ORDERS_FOUND' | translate}}
+      </h4>
+    </div>
+    <ion-card *ngFor="let order of (orders | filter : 'orders' : '' : searchText); let i = index"
+      [id]="'order-' + order?.id" tappable class="card-order" [class.loading-order]="order.selected"
+      [class.highlight]="highlight[order?.id]" [class.card-order-active]="i === 0" [class.card-order-inactive]="i > 0"
+      (click)="goToDetails(order?.id, i)" (touchstart)="holdCount(order)" (touchend)="endCount()" (touchmove)="endCount()" (touchcancel)="endCount()">
+      <ion-item lines="full">
+        <ion-avatar slot="start" class="status-icon status-{{order?.status}}">
+          <img [src]="order?.STATUS_ICON">
+        </ion-avatar>
+        <ion-label>
+          <h5>{{order?.ref}}</h5>
+          <p *ngIf="order?.shipper?.length">{{order?.shipper}}</p>
+        </ion-label>
+        <p slot="end">
+          <span *ngIf="order?.status <= STATUS.LOADED">
+            {{order?.from?.timeslot?.starts | dateFormat : _currentLang : 'DD MMM'}}
+          </span>
+          <span *ngIf="order?.status > STATUS.LOADED">
+            {{order?.to?.timeslot?.starts | dateFormat : _currentLang : 'DD MMM'}}
+          </span>
+        </p>
+      </ion-item>
+      <ion-card-content class="card-order-content">
+        <ion-grid class="card-order-grid">
+          <ion-row class="vertical-align-center ion-text-center">
+            <ion-col col-12>
+              <ion-row class="ion-text-center">
+                <ion-col col-12>
+                  <div class="location-name" [class.location-name-active]="i === 0 && order?.status < STATUS.LOADED">
+                    {{order?.from?.name}}</div>
+                  <div class="location-time">{{order?.from?.timeslot?.starts | dateFormat : _currentLang : 'HH:mm'}}
+                  </div>
+                </ion-col>
+              </ion-row>
+              <ion-row class="ion-text-center">
+                <ion-col col-12>
+                  <div class="location-name" [class.location-name-active]="i === 0 && order?.status >= STATUS.LOADED">
+                    {{order?.to?.name}}</div>
+                  <div class="location-time">{{order?.to?.timeslot?.starts | dateFormat : _currentLang : 'HH:mm'}}</div>
+                </ion-col>
+              </ion-row>
+            </ion-col>
+            <div class="icon-arrow-right" *ngIf="i === 0">
+              <ion-row text-right class="vertical-align-center">
+                <ion-col col-12>
+                  <ion-icon name="arrow-forward"></ion-icon>
+                </ion-col>
+              </ion-row>
+            </div>
+          </ion-row>
+          <ng-container
+            *ngIf="false && (order?.status === STATUS.ONSITE_LOADING || order?.status === STATUS.ONSITE_DELIVERY)">
+            <ion-row class="ion-text-center">
+              <ion-col col-12>
+                <button ion-button click-stop-propagation color="success" class="btn-action"
+                  (click)="confirmStatusChange(order, order?.status)">{{order?.STATUS_QUESTION | translate}} ?</button>
+              </ion-col>
+            </ion-row>
+          </ng-container>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

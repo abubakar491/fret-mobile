@@ -1,0 +1,184 @@
+<div class="order-details">
+  <ion-header [class]="'lang-' + currentLang">
+    <ion-toolbar color="freterium-color-blue-700">
+      <ion-title>{{ 'mobile.orderDetails.title' | translate }}</ion-title>
+      <ion-buttons slot="end">
+        <ion-button color="primary" (click)="dismiss()">
+          <span>{{ 'mobile.orderDetails.close' | translate }}</span>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [class]="'lang-' + currentLang">
+    <div class="ion-text-center order-details-avatar">
+      <ion-avatar *ngIf="STATUS_ICONS[order?.status]">
+        <div>
+          <img [class.moving-icon]="order?.status === STATUS.ONWAY_LOADING || order?.status === STATUS.ONWAY_DELIVERY"
+               [src]="STATUS_ICONS[order?.status]">
+        </div>
+        <div>{{ 'mobile.editOrder.statusLabel.' + order?.STATUS_TEXT | translate }}</div>
+      </ion-avatar>
+    </div>
+    <div class="ion-padding-horizontal">
+      <ion-card class="no-box-shadow">
+        <ion-card-header>{{ 'mobile.orderDetails.loadDetails' | translate }}</ion-card-header>
+        <ion-card-content>
+          <ng-container *ngIf="order?.order_details">
+            <span class="bloc-detail">-
+              {{
+                (order?.order_details?.type === 'full') ?
+                ('mobile.orderDetails.fullLoad' | translate) + ' ('+ order?.order_details?.data?.truck_weight + ('mobile.orderDetails.kilograms' | translate) + ')'
+                : ((order?.order_details?.type === 'indetail')
+                ? ('mobile.orderDetails.detailedLoad' | translate)
+                : ('mobile.orderDetails.metersLinearLoad' | translate))
+              }}
+            </span>
+            <span *ngIf="order?.order_details?.nature?.length" class="bloc-detail">
+              -{{ order?.order_details?.nature }}
+            </span>
+            <span *ngIf="order?.order_details?.vehicle_type?.length" class="bloc-detail">
+              - {{ order?.order_details?.vehicle_type }}
+            </span>
+            <ng-container *ngIf="order?.order_details?.data?.pallets?.length">
+              <span *ngFor="let pallet of order?.order_details?.data?.pallets; index as i;" class="bloc-detail">-
+                {{ pallet.quantity }} {{ 'mobile.orderDetails.pallets' | translate }}, {{ pallet.dimensions }}, {{ pallet.weight }}
+                {{ 'mobile.orderDetails.kilograms' | translate }}, {{ (pallet?.stackable) ? ('mobile.orderDetails.stackable' | translate) : ('mobile.orderDetails.nonStackable' | translate) }},
+                {{ (pallet?.swap) ? ('orderDetails.palletExchange' | translate) : '' }}
+              </span>
+            </ng-container>
+            <ng-container *ngIf="order?.order_details?.data?.outsizes?.length">
+              <span *ngFor="let outsize of order?.order_details?.data?.outsizes; index as i;" class="bloc-detail ">-
+                {{ outsize.quantity }} {{ 'mobile.orderDetails.outsize' | translate }}, {{ outsize.height + 'x' + outsize.width + 'x' + outsize.length }},
+                {{ outsize.weight }}{{ 'mobile.orderDetails.kilograms' | translate }},
+                {{ (outsize?.stackable) ? ('mobile.orderDetails.stackable' | translate) : ('mobile.orderDetails.nonStackable' | translate) }}
+              </span>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngIf="order?.order_details?.data?.truck_weight">
+            <span class="bloc-detail">- {{order?.order_details?.data?.truck_weight}} {{ 'mobile.orderDetails.kilograms' | translate }} </span>
+          </ng-container>
+          <ng-container *ngIf="!order?.order_details">
+            <span class="bloc-detail">{{ 'mobile.orderDetails.noDetails' | translate }}</span>
+          </ng-container>
+          <span class="bloc-detail">
+            {{ order?.comment }}
+          </span>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="no-box-shadow location-wrapper location-from">
+        <ion-card-header>
+          <span>{{ order?.from?.name }}</span>
+        </ion-card-header>
+        <ion-card-content>
+          <span class="bloc-detail">
+            <ion-icon name="flag"></ion-icon>
+            {{ order?.from?.address + ((order?.from?.address_additional?.length) ? ' - '+order?.from?.address_additional : '') }}
+          </span>
+          <div class="bloc-detail">
+            <span>
+              <ion-icon name="time"></ion-icon>
+              {{ order?.from?.timeslot?.starts | date:'dd/MM HH:mm' }}
+            </span>
+            <span *ngIf="order?.from?.timeslot?.ends?.length && (order?.from?.timeslot?.starts | date:'dd/MM') === (order?.from?.timeslot?.ends | date:'dd/MM')">
+              - {{ order?.from?.timeslot?.ends | date:'HH:mm' }}
+            </span>
+            <span *ngIf="order?.from?.timeslot?.ends?.length && (order?.from?.timeslot?.starts | date: 'dd/MM') !== (order?.from?.timeslot?.ends | date:'dd/MM')">
+              - {{ order?.from?.timeslot?.ends | date:'dd/MM HH:mm' }}
+            </span>
+          </div>
+          <span *ngIf="order?.from?.instructions?.length" class="bloc-detail">
+            <ion-icon name="information-outline"></ion-icon>
+            <span>
+              {{ 'mobile.orderDetails.loadingInstructions' | translate }} : {{ (order?.from?.instructions?.length) ? order?.from?.instructions : 'N/A' }}
+            </span>
+          </span>
+          <div class="bloc-detail bloc-detail-show">
+            <div *ngIf="order?.from?.contact?.name?.length">
+              <ion-icon name="person"></ion-icon> <span>{{ order?.from?.contact?.name }}</span>
+            </div>
+            <div *ngIf="order?.from?.contact?.phone?.length">
+              <span (click)="makeCall(order?.from?.contact?.phone)">
+                <ion-icon name="call"></ion-icon>
+                {{ order?.from?.contact?.phone }}
+              </span>
+            </div>
+            <div *ngIf="order?.from?.contact?.phone_2?.length">
+              <span (click)="makeCall(order?.from?.contact?.phone_2)">
+                <ion-icon name="call"></ion-icon>
+                {{ order?.from?.contact?.phone_2 }}
+              </span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="no-box-shadow location-wrapper location-to">
+        <ion-card-header>
+          <span>{{ order?.to?.name }}</span>
+        </ion-card-header>
+        <ion-card-content>
+          <span class="bloc-detail">
+            <ion-icon name="flag"></ion-icon>
+            {{ order?.to?.address + ((order?.to?.address_additional?.length) ? ' - '+order?.to?.address_additional : '') }}
+          </span>
+          <div class="bloc-detail">
+            <span>
+              <ion-icon name="time"></ion-icon>
+              {{ order?.to?.timeslot?.starts | date:'dd/MM HH:mm ' }}
+            </span>
+            <span *ngIf="order?.to?.timeslot?.ends?.length && (order?.to?.timeslot?.starts | date:'dd/MM') === (order?.to?.timeslot?.ends | date:'dd/MM')">
+              - {{ order?.to?.timeslot?.ends | date:'HH:mm' }}
+            </span>
+            <span *ngIf="order?.to?.timeslot?.ends?.length && (order?.to?.timeslot?.starts | date:'dd/MM') !== (order?.to?.timeslot?.ends | date:'dd/MM')">
+              - {{ order?.to?.timeslot?.ends | date:'dd/MM HH:mm' }}
+            </span>
+          </div>
+          <span class="bloc-detail" *ngIf="order?.to?.instructions?.length">
+            <ion-icon name="information-outline"></ion-icon>
+            <span>
+              {{ 'mobile.orderDetails.unloadingInstructions' | translate }}: {{ (order?.to?.instructions?.length) ? order?.from?.instructions : 'N/A' }}
+            </span>
+          </span>
+          <div class="bloc-detail">
+            <div *ngIf="order?.to?.contact?.name?.length">
+              <ion-icon name="person"></ion-icon> <span>{{ order?.to?.contact?.name }}</span>
+            </div>
+            <div *ngIf="order?.to?.contact?.phone?.length">
+              <span (click)="makeCall(order?.to?.contact?.phone)">
+                <ion-icon name="call"></ion-icon>
+                {{ order?.to?.contact?.phone }}
+              </span>
+            </div>
+            <div *ngIf="order?.to?.contact?.phone_2?.length">
+              <span (click)="makeCall(order?.to?.contact?.phone_2)">
+                <ion-icon name="call"></ion-icon>
+                {{ order?.to?.contact?.phone_2 }}
+              </span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngIf="order?.orderItems?.length" class="no-box-shadow location-wrapper products">
+        <ion-card-header>
+          <span>{{ 'mobile.orderDetails.products' | translate }}</span>
+        </ion-card-header>
+        <div class="bloc-detail">
+          <ion-row>
+            <ion-col size="12" class="ion-text-start">
+              <ion-badge class="product" color="light" *ngFor="let item of order.orderItems">
+                {{ item.quantity }} x
+                <ng-container *ngIf="!item.product.name || item.product.name == ''">
+                  <i>{{ 'mobile.orderDetails.products' | translate }}</i>
+                </ng-container>
+                {{ item.product.name }}
+              </ion-badge>
+            </ion-col>
+          </ion-row>
+        </div>
+      </ion-card>
+    </div>
+  </ion-content>
+</div>

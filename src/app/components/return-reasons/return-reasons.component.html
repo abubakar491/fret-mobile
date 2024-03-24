@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar color="freterium-color-blue-700">
+    <ion-buttons slot="start" class="edit-order-back-btn">
+      <ion-button (click)="close()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <ion-title>
+        {{
+          state === 'not_loaded'
+            ? ('mobile.returnReason.notLoaded' | translate)
+            : (state === 'partial_delivery' && type === 'POD'
+                ? 'mobile.returnReason.partialDelivery'
+                : (state === 'partial_delivery' && type !== 'POD'
+                    ? 'mobile.returnReason.partialLoaded'
+                    : 'mobile.returnReason.return'))
+          | translate
+        }}
+      </ion-title>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="state !== 'partial_delivery'">
+  <ion-row>
+    <ion-col>
+      <div class="pod-choice">
+        <div class="with-pod" *ngIf="selectedPhotos.length > 0">
+          <img [src]="selectedPhotos[0]" alt="">
+          <ion-icon class="close-icon" name="close" (click)="removePicture(0)"></ion-icon>
+        </div>
+        <div class="with-pod" *ngIf="selectedPhotos.length === 0" (click)="takePicture()">
+          <ion-icon class="add-icon" name="add"></ion-icon>
+        </div>
+      </div>
+    </ion-col>
+    <ion-col size="12">
+      <div *ngIf="selectedPhotos?.length" class="ion-text-center pods-counter">
+        {{ selectedPhotos?.length }}
+        {{ ((selectedPhotos?.length === 1) ? 'mobile.confirmLoading.photo' : 'mobile.confirmLoading.photos') | translate }}
+        {{ 'mobile.confirmLoading.toSend' | translate }}
+      </div>
+      <div *ngIf="selectedPhotos?.length === 0" class="ion-text-center pods-counter">
+        {{ 'mobile.confirmLoading.clickToTakePhoto' | translate }}
+      </div>
+    </ion-col>
+  </ion-row>
+  </div>
+
+  <ion-item>
+    <ionic-selectable
+      item-content
+      placeholder="{{ 'mobile.returnReason.selectReason' | translate }}"
+      label="Solid select"
+      label-placement="floating"
+      fill="solid"
+      [(ngModel)]="selectedReason"
+      itemValueField="id"
+      itemTextField="text"
+      [hasVirtualScroll]="false"
+      [items]="issuesList"
+      [canSearch]="true"
+      (onChange)="setProblem($event)"
+    >
+      <ng-template ionicSelectableItemTemplate let-issue="item">
+        {{ issue?.text | translate }}
+      </ng-template>
+
+      <ng-template ionicSelectableValueTemplate let-issue="value">
+        {{ issue?.text | translate }}
+      </ng-template>
+    </ionic-selectable>
+  </ion-item>
+</ion-content>
+
+<ion-footer class="ion-no-border ion-padding">
+    <ion-button
+    (click)="sendProblem()" expand="block" size="large">
+      {{ 'mobile.returnReason.submit' | translate }}
+    </ion-button>
+</ion-footer>

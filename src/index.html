@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    window["startDate"] = new Date();
+
+    fetch("https://ipinfo.io/json?token=36d02ea41288c7").then(
+      (response) => response.json()
+    )
+      .then(function (response) {
+        if (response.country?.length === 2) {
+          window['defaultCountryiso'] = response.country.toLowerCase();
+        } else {
+          window['defaultCountryiso'] = null;
+        }
+      })
+      .catch((e) => {
+        console.error('Request failed', e);
+      });
+  </script>
+
+  <meta charset="utf-8" />
+  <title>Freterium</title>
+
+  <base href="/" />
+
+  <meta name="color-scheme" content="light dark" />
+  <meta name="viewport"
+    content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="msapplication-tap-highlight" content="no" />
+
+  <link rel="icon" type="image/png" href="assets/icon/favicon.png" />
+
+  <!-- add to homescreen for ios -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+</head>
+
+<body>
+  <freterium-root></freterium-root>
+</body>
+
+</html>

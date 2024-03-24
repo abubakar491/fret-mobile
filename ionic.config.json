@@ -1,0 +1,7 @@
+{
+  "name": "Freterium",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

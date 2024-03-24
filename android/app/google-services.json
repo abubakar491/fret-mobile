@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "310777593425",
+    "firebase_url": "https://freterium-app.firebaseio.com",
+    "project_id": "freterium-app",
+    "storage_bucket": "freterium-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310777593425:android:342c86ea96a6dcc8",
+        "android_client_info": {
+          "package_name": "com.freterium.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "310777593425-r9hse82q6janmi54p2ssvgb22r63mr8g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrlkHBOmfbrVRlzta5lbIQB8c-43UPHHA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,121 @@
+ion-toolbar {
+  --background: white;
+  --border-style: none;
+
+  @media (prefers-color-scheme: dark) {
+    --background: transparent;
+  }
+
+  ion-title {
+    padding-left: 1rem;
+    font-size: 20px;
+  }
+
+  ion-icon {
+    color: #121212;
+
+    @media (prefers-color-scheme: dark) {
+      color: white;
+    }
+  }
+}
+
+ion-list.radio-list {
+  padding: 1rem;
+}
+
+label.disabled {
+  color: rgba(0, 0, 0, .7);
+
+  @media (prefers-color-scheme: dark) {
+    color: rgba(255, 255, 255, .6);
+  }
+}
+
+.non-available {
+  margin: 2rem 0;
+  color: rgba(0, 0, 0, 0.7);
+
+  @media (prefers-color-scheme: dark) {
+    color: rgba(255, 255, 255, .6);
+  }
+}
+
+.input-container {
+  margin: 1rem 0;
+  display: flex;
+
+  input[type="radio"] {
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Chrome, Safari, Opera */
+    transform: scale(1.5);
+    margin-right: 1rem;
+  }
+
+  label {
+    overflow-wrap: break-word;
+  }
+}
+
+ion-modal.custom-dialog {
+  --width: calc(100% - 2rem);
+  --max-width: 400px;
+  --min-width: 250px;
+  --max-height: 340px;
+  --border-radius: 6px;
+  --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.1);
+
+  .wrapper {
+    margin-bottom: 10px;
+
+    ion-item {
+      margin: 10px 0;
+    }
+
+    h1 {
+      margin: 20px 20px 10px 20px;
+      font-size: 21px;
+    }
+
+    .modal-actions {
+      display: flex;
+      margin: 1rem;
+
+      .stretch {
+        flex: 1 1 auto;
+      }
+
+      ion-button {
+        width: 100%;
+      }
+
+      .cancel-btn {
+        margin-right: 1rem;
+      }
+    }
+  }
+
+  &.confirm-dialog {
+    --max-height: 300px;
+
+    .wrapper {
+      padding: 1rem;
+
+      h1 {
+        text-align: center;
+      }
+
+      ion-text {
+        p {
+          text-align: center;
+          margin: 1.5rem 0;
+          color: #677189;
+        }
+      }
+
+      ion-button {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+}

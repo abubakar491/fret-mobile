@@ -1,0 +1,43 @@
+.login {
+  --wrapper-top-gutter: 20vh;
+  --left-gutter: 16px;
+
+  &-wrapper {
+    margin-top: var(--wrapper-top-gutter);
+
+    &-logo {
+      width: 200px;
+      @media (prefers-color-scheme: dark) {
+        filter: brightness(5);
+      }
+    }
+
+    &-end-text {
+      font-size: 12px;
+      margin-top: 10px;
+      text-decoration: underline;
+      color: var(--freterium-blue-100);
+    }
+  }
+
+  &-background-image {
+    position: absolute;
+    bottom: 0;
+    background: url("./../../../../assets/images/freterium-login-background.gif") no-repeat center 100%;
+    background-size: 100%;
+    // max-width: 400px;
+    margin: 0 auto 0 calc(var(--left-gutter) * -1);
+    min-height: 150px;
+    width: 100%;
+    z-index: -1;
+
+    @media (prefers-color-scheme: dark) {
+      filter: invert(94%);
+    }
+  }
+
+  .version {
+    opacity: 0.5;
+    font-size: 0.9em;
+  }
+}
