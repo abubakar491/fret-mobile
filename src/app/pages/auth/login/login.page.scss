@@ -7,6 +7,7 @@
 
     &-logo {
       width: 200px;
+
       @media (prefers-color-scheme: dark) {
         filter: brightness(5);
       }
@@ -40,4 +41,9 @@
     opacity: 0.5;
     font-size: 0.9em;
   }
+}
+
+.tel-input {
+  margin-top: 40px;
+  margin-bottom: 30px;
 }

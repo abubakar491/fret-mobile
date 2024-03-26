@@ -10,63 +10,70 @@ import {
 } from '@angular/core';
 import {
   Barcode,
-  BarcodeFormat,
   BarcodeScanner,
-  LensFacing,
 } from '@capacitor-mlkit/barcode-scanning';
 import { ModalController, ToastController } from '@ionic/angular';
 
-interface OrderList {
-  [key: string]: {
-    expectedQuantity: number;
-    scannedQuantity: number;
+interface ProductLineItem {
+  id: string;
+  name: string;
+  code: string;
+  quantity: number;
+  loadedCount: number | null;
+  deliveredCount: number;
+  value: number;
+  customerCurrency: string | null;
+  orderedCount: number;
+  product: {
+    id: string;
+    name: string;
+    code: string;
+    price: number;
+    category: string | null;
+    scanCode: string | null;
   };
+  selectedQuantity: number;
+  expectedQuantity: number;
+  checked: boolean;
+  indeterminate: boolean;
 }
+
+interface ScanCount {
+  id: string;
+  expectedQuantity: number;
+  scannedQuantity: number;
+}
+
 @Component({
   selector: 'app-order-scanner',
   templateUrl: './order-scanner.component.html',
   styleUrls: ['./order-scanner.component.scss'],
 })
 export class OrderScannerComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() formats: BarcodeFormat[] = [];
-  @Input() lensFacing: LensFacing = LensFacing.Back;
-  @ViewChild('square') squareElement!: ElementRef<HTMLDivElement>;
 
-  public isTorchAvailable = false;
+  @ViewChild('square') squareElement!: ElementRef<HTMLDivElement>;
+  @Input() productLineItem: ProductLineItem[];
+  private productCountMap: { [productName: string]: ScanCount } = {};
+
   private scannerListener: any;
   public barcodeArr: any[] = [];
   showNotification = false;
   notificationMessage = '';
   throttling = false;
 
-  private currentOrderList: OrderList = {
-    item1: { expectedQuantity: 5, scannedQuantity: 0 },
-    item2: { expectedQuantity: 5, scannedQuantity: 0 },
-    item3: { expectedQuantity: 5, scannedQuantity: 0 },
-    item4: { expectedQuantity: 5, scannedQuantity: 0 },
-    item5: { expectedQuantity: 5, scannedQuantity: 0 },
-    item6: { expectedQuantity: 5, scannedQuantity: 0 },
-    item7: { expectedQuantity: 5, scannedQuantity: 0 },
-    item8: { expectedQuantity: 5, scannedQuantity: 0 },
-    item9: { expectedQuantity: 5, scannedQuantity: 0 },
-    item10: { expectedQuantity: 5, scannedQuantity: 0 },
-    item11: { expectedQuantity: 5, scannedQuantity: 0 },
-    item12: { expectedQuantity: 5, scannedQuantity: 0 },
-    item13: { expectedQuantity: 5, scannedQuantity: 0 },
-    item14: { expectedQuantity: 5, scannedQuantity: 0 },
-    item15: { expectedQuantity: 5, scannedQuantity: 0 },
-  };
-
   constructor(
     private readonly ngZone: NgZone,
-    private toastController: ToastController,
     private modalController: ModalController
   ) {}
 
   ngOnInit(): void {
     this.barcodeArr = [];
-    BarcodeScanner.isTorchAvailable().then((result) => {
-      this.isTorchAvailable = result.available;
+    this.productLineItem.forEach(item => {
+      this.productCountMap[item.product.name] = {
+        id: item.id,
+        expectedQuantity: item.expectedQuantity,
+        scannedQuantity: 0
+      };
     });
   }
 
@@ -84,16 +91,17 @@ export class OrderScannerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updateDisplayList(): void {
-    this.barcodeArr = Object.keys(this.currentOrderList).map((key) => {
+    this.barcodeArr = Object.entries(this.productCountMap).map(([productName, scanData]) => {
       return {
-        name: key,
-        ...this.currentOrderList[key],
-        isComplete:
-          this.currentOrderList[key].scannedQuantity >=
-          this.currentOrderList[key].expectedQuantity,
+        id: scanData.id,
+        name: productName,
+        expectedQuantity: scanData.expectedQuantity,
+        scannedQuantity: scanData.scannedQuantity,
+        isComplete: scanData.scannedQuantity >= scanData.expectedQuantity
       };
     });
   }
+  
 
   getCompletedItemCount(): number {
     return this.barcodeArr.filter((item) => item.isComplete).length;
@@ -112,7 +120,7 @@ export class OrderScannerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private addScannerListener(): void {
     let lastInvocationTime = 0;
-    const throttleDelay = 1500; // 3000 milliseconds (1.5 seconds) delay
+    const throttleDelay = 1500; // 1500 milliseconds (1.5 seconds) delay
 
     BarcodeScanner.addListener('barcodeScanned', (event) => {
       if (!this.isBarcodeWithinRectangle(event.barcode)) {
@@ -142,63 +150,45 @@ export class OrderScannerComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  async showErrToast(msg: string) {
-    const toast = await this.toastController.create({
-      message: msg,
-      duration: 2000,
-      mode: 'ios',
-      color: 'danger',
-      position: 'middle',
-    });
-
-    await toast.present();
-  }
-
-  async showSuccesstoast(msg: string) {
-    const toast = await this.toastController.create({
-      message: msg,
-      duration: 2000,
-      mode: 'ios',
-      color: 'success',
-      position: 'middle',
-    });
-
-    await toast.present();
-  }
-
   handleBarcodeScanned(barcodeValue: string) {
-    const item = this.currentOrderList[barcodeValue];
-    if (!item) {
+    const scannedProduct = this.productLineItem.find(item => item.product.scanCode === barcodeValue);
+    if (!scannedProduct) {
       this.showCustomNotification(`SKU not found in order: ${barcodeValue}`);
       return;
     }
 
-    if (item.scannedQuantity < item.expectedQuantity) {
-      item.scannedQuantity++;
-      const notificationMessage =
-        item.scannedQuantity === item.expectedQuantity
-          ? `${barcodeValue} fully scanned`
-          : `Scanned ${barcodeValue}: ${item.scannedQuantity}/${item.expectedQuantity}`;
-      this.showCustomNotification(notificationMessage);
+    const tracking = this.productCountMap[scannedProduct.product.name];
+    if (tracking.scannedQuantity < tracking.expectedQuantity) {
+      // Increment the scanned quantity
+      tracking.scannedQuantity++;
+      this.showCustomNotification(`Scanned ${scannedProduct.product.name}: ${tracking.scannedQuantity}/${tracking.expectedQuantity}`);
+      
+      // If reached expected quantity, optionally show a different message
+      if (tracking.scannedQuantity === tracking.expectedQuantity) {
+        this.showCustomNotification(`${scannedProduct.product.name} quantity fulfilled.`);
+      }
     } else {
-      this.showCustomNotification(`${barcodeValue} already fully scanned`);
+      this.showCustomNotification(`Expected quantity for ${scannedProduct.product.name} already reached.`);
     }
 
     // Update the display list after processing the scan
     this.updateDisplayList();
-    console.log('Updated barcodeArr:', this.barcodeArr);
   }
 
   async showCustomNotification(message: string) {
     this.notificationMessage = message;
     this.showNotification = true;
     setTimeout(() => {
+      this.notificationMessage = '';
       this.showNotification = false;
     }, 2000);
   }
 
   completeOrder() {
-    console.log('Order completed', this.barcodeArr);
+    this.modalController.dismiss({
+      scannedItems: this.barcodeArr
+    });
+    this.stopScan();
   }
 
   private isBarcodeWithinRectangle(barcode: Barcode): boolean {

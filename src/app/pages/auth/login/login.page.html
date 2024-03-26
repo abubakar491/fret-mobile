@@ -10,44 +10,22 @@
 <ion-content class="ion-padding login">
   <form [formGroup]="loginForm">
     <div class="login-wrapper">
-      <img
-        src="./../../../assets/images/freterium-logo-dark.png"
-        class="login-wrapper-logo ion-margin-bottom"
-      />
-
-      <ion-list>
-        <ion-item>
-          <ion-label position="stacked"
-            >{{ 'mobile.login.phone_number' | translate }}</ion-label
-          >
-          <!-- <ion-input type="text" formControlName="login"></ion-input> -->
-          <!-- <ion-intl-tel-input
-            formControlName="login"
-            [preferredCountries]="preferredCountries"
-            [defaultCountryiso]="defaultCountryiso"
-            [modalTitle]="'mobile.login.select_country' | translate"
-            [modalCloseText]="'mobile.login.close' | translate"
-            [modalSearchPlaceholder]="'mobile.login.enter_country_name' | translate"
-            ionIntlTelInputValid
-          >
-          </ion-intl-tel-input> -->
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked"
-            >{{ 'mobile.login.password' | translate }}</ion-label
-          >
-          <ion-input type="password" formControlName="password"></ion-input>
-        </ion-item>
-      </ion-list>
+      <img src="./../../../assets/images/freterium-logo-dark.png" class="login-wrapper-logo ion-margin-bottom" />
+      <div class="tel-input">
+        <ion-label>{{ 'mobile.login.phone_number' | translate }}</ion-label>
+        <ngx-intl-tel-input formControlName="login" [preferredCountries]="preferredCountries"
+          [enableAutoCountrySelect]="false" [enablePlaceholder]="true" [searchCountryFlag]="true"
+          [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]" [selectFirstCountry]="false"
+          [selectedCountryISO]="defaultCountryiso" [maxLength]="15" [phoneValidation]="true"></ngx-intl-tel-input>
+      </div>
+      <ion-label position="undefined">{{ 'mobile.login.password' | translate }}</ion-label>
+      <ion-item>
+        <ion-input type="password" formControlName="password"></ion-input>
+      </ion-item>
 
       <div class="ion-margin-top ion-text-center">
-        <ion-button
-          class="ion-margins-top"
-          color="primary"
-          shape="round"
-          [disabled]="loginForm.invalid || isPending"
-          (click)="login()"
-        >
+        <ion-button class="ion-margins-top" color="primary" shape="round" [disabled]="loginForm.invalid || isPending"
+          (click)="login()">
           {{ 'mobile.login.login' | translate }}
         </ion-button>
         <!-- <div tappable class="login-wrapper-end-text" (click)="forgotPassword()" >{{ 'mobile.login.forgotPassword' | translate }}</div> -->

@@ -8,13 +8,15 @@ import { environment } from '../../environments/environment';
 import { BaseApiService } from '../core/services/base-api.service';
 import { DriverService } from '../core/services/driver.service';
 import { Order, PostOrder } from '../models';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
   constructor(
     private toastController: ToastController,
     private baseApiService: BaseApiService,
-    private driverService: DriverService
+    private driverService: DriverService,
+    public translateService: TranslateService
   ) {}
 
   /**
@@ -128,6 +130,11 @@ export class OrderService {
 
   getStoredReturnReasons() {
     let returnReasons = JSON.parse(localStorage.getItem('return_reasons'));
+    returnReasons.map((issue) => {
+      issue['message'] = this.translateService.instant(issue.text);
+      return issue;
+    })
+    console.log('returnReasons', returnReasons);
     return returnReasons;
   }
 

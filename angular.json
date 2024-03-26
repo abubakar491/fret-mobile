@@ -33,7 +33,10 @@
             "styles": [
               "src/theme/variables.scss",
               "src/global.scss",
-              "node_modules/flag-icons/sass/flag-icons.scss"
+              "node_modules/flag-icons/sass/flag-icons.scss",
+              "./node_modules/intl-tel-input/build/css/intlTelInput.css",
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css"
             ],
             "scripts": [],
             "aot": false,
@@ -122,17 +125,17 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "app:build"
+            "buildTarget": "app:build"
           },
           "configurations": {
             "development": {
-              "browserTarget": "app:build:development"
+              "buildTarget": "app:build:development"
             },
             "staging": {
-              "browserTarget": "app:build:staging"
+              "buildTarget": "app:build:staging"
             },
             "production": {
-              "browserTarget": "app:build:production"
+              "buildTarget": "app:build:production"
             },
             "ci": {
               "progress": false
@@ -142,7 +145,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "app:build"
+            "buildTarget": "app:build"
           }
         },
         "test": {

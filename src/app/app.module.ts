@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, importProvidersFrom } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -18,12 +18,15 @@ import { Preferences } from "@capacitor/preferences";
 
 import AuthModule from './pages/auth/auth.module';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { createTranslateLoader } from './shared/shared.module';
 
-// import { IonIntlTelInputModule } from 'ion-intl-tel-v2';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
-
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+export function HttpLoaderFactory(httpClient: HttpClient) {
+  return new TranslateHttpLoader(httpClient);
+}
 
 
 @NgModule({
@@ -36,19 +39,20 @@ import { createTranslateLoader } from './shared/shared.module';
     CoreModule,
     AuthModule,
     AppRoutingModule,
-    TranslateModule.forRoot({
+  ],
+  exports: [],
+  providers: [
+    // { provide: LOCALE_ID, useValue: 'fr' },
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    provideAnimations(),
+    importProvidersFrom(HttpClientModule), // or provideHttpClient() in Angular v15
+    importProvidersFrom(TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
         useFactory: createTranslateLoader,
         deps: [HttpClient]
       }
-    }),
-    // IonIntlTelInputModule
-  ],
-  exports:[],
-  providers: [
-    // { provide: LOCALE_ID, useValue: 'fr' },
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    }))
   ],
   bootstrap: [AppComponent]
 

@@ -12,13 +12,28 @@
     <ion-title *ngIf="type == 'POL'">
       {{ 'mobile.confirmLoading.polTitle' | translate }}
     </ion-title>
-    <ion-buttons slot="end" *ngIf="!isScannerActive">
+    <ion-buttons slot="end" *ngIf="!isScannerActive && productLineItems.length">
       <ion-button (click)="openScanner()">
         <ion-icon name="barcode-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+<div>
+  <ion-button (click)="openSettings()">
+    <span class="close-button">Open Settings</span>
+  </ion-button>
+
+  <!-- <ion-button (click)="installGoogleBarcodeScannerModule()">
+    <span class="close-button">Install Google Barcode Scanner
+      Module</span>
+  </ion-button> -->
+
+  <ion-button (click)="requestPermissions()">
+    <span class="close-button">Request Permissions</span>
+  </ion-button>
+
+</div>
 <ion-content>
   <div>
     <h2>

@@ -1,5 +1,6 @@
-import { Component, Input, ViewChild } from '@angular/core';
-import { ModalController, NavParams, PopoverController, ToastController } from '@ionic/angular';
+import { Component, Input } from '@angular/core';
+import { ModalController, NavParams,  ToastController } from '@ionic/angular';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 
 import * as moment from 'moment';
 import { take } from 'rxjs/operators';
@@ -11,11 +12,7 @@ import { Driver } from './../../core/models';
 import { ChatMessage, MessageType, Order } from './../../models';
 import { MediaService } from './../../services/media.service';
 import { Components } from '@ionic/core';
-
 import { OrderScannerComponent } from '../order-scanner/order-scanner.component';
-import {
-  BarcodeScanner,
-} from '@capacitor-mlkit/barcode-scanning';
 
 @Component({
   selector: 'freterium-confirm-loading',
@@ -35,24 +32,6 @@ export class ConfirmLoadingComponent {
   showConfirmSendPOD = false;
   productLineItems = [];
   showOrderItems = false;
-
-  // productLineItems = [
-  //   {
-  //     name: 'abc0',
-  //     totalQuantity: 1100,
-  //     quantity: 0
-  //   },
-  //   {
-  //     name: 'abc1',
-  //     totalQuantity: 1100,
-  //     quantity: 0
-  //   },
-  //   {
-  //     name: 'abc2',
-  //     totalQuantity: 1100,
-  //     quantity: 0
-  //   },
-  // ]
 
   constructor(
     private navParams: NavParams,
@@ -97,7 +76,7 @@ export class ConfirmLoadingComponent {
     });
   }
 
-  async checkBarcodeScannerSupported() {
+  async isScannerSupported() {
     if(!BarcodeScanner.isSupported()) {
       const toast = await this.toastController.create({
         message: 'Barcode Scanner is not supported on this device',
@@ -106,13 +85,37 @@ export class ConfirmLoadingComponent {
       toast.present();
       return false;
     }
+    return true;
   }
   async openScanner() {
+    // Check if scanner is supported
+    if(!BarcodeScanner.isSupported()) {
+      const toast = await this.toastController.create({
+        message: 'Barcode Scanner is not supported on this device',
+        duration: 2000
+      });
+      toast.present();
+      return;
+    }
+
+    const checkPermission = await BarcodeScanner.checkPermissions();
+    if(checkPermission.camera !== 'granted'){
+      await this.requestCameraPermissionsForScanning();
+    }
+
+    if(this.productLineItems.length < 1){
+      const toast = await this.toastController.create({
+        message: 'No products to scan',
+        duration: 2000
+      });
+      toast.present();
+      return;
+    }
+
     const modal = await this.modalController.create({
       component: OrderScannerComponent,
-      // cssClass: 'barcode-scanning-modal',
-      // showBackdrop: false,
-      // You can pass data to the modal if needed:
+      cssClass: 'barcode-scanning-modal',
+      showBackdrop: false,
       componentProps: {
         'productLineItem': this.productLineItems
       }
@@ -122,16 +125,28 @@ export class ConfirmLoadingComponent {
 
     const { data } = await modal.onDidDismiss();
     if (data) {
-      // Handle the data returned from the scanner modal
+      this.setProductLineItemsCountAsPerScanning(data.scannedItems);
       this.handleOrderComplete(data.scannedItems);
     }
   }
 
   handleOrderComplete(scannedItems: any[]) {
-    console.log('Completed Order with Items:', scannedItems);
-    debugger;
     this.scannedItems = scannedItems;
+    const isOrderPartial = scannedItems.some(item => item.isComplete == false);
     this.isScannerActive = false;
+    this.sendPODandChangeStatus(isOrderPartial, this.type);
+  }
+
+  setProductLineItemsCountAsPerScanning(scannedItems){
+    scannedItems.forEach(scannedItem => {
+      const productLineItemIndex = this.productLineItems.findIndex(item => item.id === scannedItem.id);
+      this.productLineItems[productLineItemIndex].selectedQuantity = scannedItem.scannedQuantity;
+      this.formatQuantity(productLineItemIndex);
+    });
+  }
+
+  public async requestCameraPermissionsForScanning(): Promise<void> {
+    await BarcodeScanner.requestPermissions();
   }
 
   removePicture(index) {

@@ -10,13 +10,14 @@ ion-content {
   width: 100% !important;
   height: 50vh;
 }
-.square_without_borders{
-  width:100%;
-  height:100%;
+
+.square_without_borders {
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  vertical-align:middle;
+  vertical-align: middle;
 }
 
 .list_div {
@@ -28,18 +29,18 @@ ion-content {
   bottom: 0;
 }
 
-.list_header{
-  padding:10px;
+.list_header {
+  padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  column-gap: 0.5rem/* 8px */;
-  border-bottom:1px solid gray;
+  column-gap: 0.5rem; /* 8px */
+  border-bottom: 1px solid gray;
 }
 
-.main_card{
-  height:40vh;
-  overflow-y:auto!important
+.main_card {
+  height: 40vh;
+  overflow-y: auto !important
 }
 
 .item-card {
@@ -50,7 +51,7 @@ ion-content {
   padding: 10px;
   margin: 5px;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   position: relative;
 }
 
@@ -64,18 +65,14 @@ ion-content {
 .tick-icon {
   border-radius: 50%;
   font-size: 25px;
-  margin-right: 10px; 
+  margin-right: 10px;
   color: white;
 }
 
 .green-tick {
   font-size: 22px;
   color: #759444;
-  
-}
 
-.blue-tick {
- 
 }
 
 .green-border {
@@ -87,7 +84,7 @@ ion-content {
 }
 
 .quantity-box {
-  text-align: center!important;
+  text-align: center !important;
   padding: 5px 10px;
   border-radius: 5px;
   background-color: #f8f8f8;
@@ -103,7 +100,8 @@ ion-content {
   background-color: #EEEEEE;
 }
 
-.scanned-quantity, .expected-quantity {
+.scanned-quantity,
+.expected-quantity {
   font-weight: bold;
 }
 
@@ -117,7 +115,7 @@ ion-content {
   color: white;
   padding: 10px;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   z-index: 1000;
 }
 
@@ -142,7 +140,7 @@ ion-content {
 }
 
 .scan-prompt p:last-child {
-  color: #A9A9A9; 
+  color: #A9A9A9;
   font-size: 11px;
   font-weight: 400;
   margin-top: -5px;
@@ -156,10 +154,11 @@ ion-content {
   display: flex;
   justify-content: center;
   padding: 10px;
-  box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.close-button, .complete-button {
+.close-button,
+.complete-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;

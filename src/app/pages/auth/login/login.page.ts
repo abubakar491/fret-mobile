@@ -11,7 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { getDiffTime } from '../../../shared/shared.module';
 import { environment } from '../../../../environments/environment';
 import { DriverService } from '../../../core/services/driver.service';
-
+import { SearchCountryField, CountryISO } from 'ngx-intl-tel-input-gg';
 
 
 @Component({
@@ -33,6 +33,10 @@ export class LoginPage implements OnInit {
   ];
 
   defaultCountryiso = 'us';
+
+  SearchCountryField = SearchCountryField;
+
+  CountryISO = CountryISO;
 
   constructor(
     private platform: Platform,
@@ -81,8 +85,8 @@ export class LoginPage implements OnInit {
   login(): void {
     this.isPending = true;
     const form = {
-      //   login: encodeURIComponent(this.loginForm.value.login.internationalNumber.replace(/[^\d,+]/g, '')),
-      login: this.loginForm.value.login,
+        login: encodeURIComponent(this.loginForm.value.login.internationalNumber.replace(/[^\d,+]/g, '')),
+      // login: this.loginForm.value.login,
       password: this.loginForm.value.password
     }
     console.log('form', form);

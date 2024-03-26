@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { NavParams } from '@ionic/angular';
 import { Components } from '@ionic/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AlertController } from '@ionic/angular';
 
 import { Order } from '../../models';
@@ -10,11 +10,22 @@ import { OrderService } from '../../services/order.service';
 import { DriverService } from '../../core/services/driver.service';
 import { MediaService } from './../../services/media.service';
 import { ReturnStep } from '../../models/index'
+import { IonicSelectableComponent } from 'ionic-selectable';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'freterium-return-reasons',
   templateUrl: './return-reasons.component.html',
   styleUrls: ['./return-reasons.component.scss'],
+  standalone: true,
+  imports: [
+    TranslateModule,
+    CommonModule,
+    FormsModule,
+    IonicSelectableComponent
+  ]
 })
 export class ReturnReasonsComponent {
   @Input() modal: Components.IonModal;
