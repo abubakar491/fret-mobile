@@ -83,11 +83,12 @@ export class LoginPage implements OnInit {
    * else call `presentToast()` method.
    */
   login(): void {
+    const phoneNumber = '+212656887387'
+    const password = '0656887387';
     this.isPending = true;
     const form = {
-        login: encodeURIComponent(this.loginForm.value.login.internationalNumber.replace(/[^\d,+]/g, '')),
-      // login: this.loginForm.value.login,
-      password: this.loginForm.value.password
+      login: encodeURIComponent(phoneNumber),
+      password: password
     }
     console.log('form', form);
     console.log('loginForm.value.login', this.loginForm.value.login);
