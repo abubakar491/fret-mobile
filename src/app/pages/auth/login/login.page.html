@@ -24,7 +24,7 @@
       </ion-item>
 
       <div class="ion-margin-top ion-text-center">
-        <ion-button class="ion-margins-top" color="primary" shape="round" [disabled]="loginForm.invalid || isPending"
+        <ion-button class="ion-margins-top" color="primary" shape="round" [disabled]="isPending"
           (click)="login()">
           {{ 'mobile.login.login' | translate }}
         </ion-button>
